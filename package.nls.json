@@ -1,5 +1,5 @@
 {
-  "reactNative.description": "Debugging and integrated commands for React Native",
+  "reactNative.description": "(Sleeper Version) Debugging and integrated commands for React Native",
   "reactNative.license": "SEE LICENSE IN LICENSE.txt",
   "reactNative.workspaceTrust.description": "Trust is required to debug code in this workspace.",
   "reactNative.virtualWorkspaces.description": "Debugging is not possible in virtual workspaces.",
@@ -98,6 +98,7 @@
   "reactNative.configuration.properties.react-native-tools.projectRoot.description": "Subfolder in which the React Native project is located",
   "reactNative.configuration.properties.react-native-tools.logLevel.description": "Logging level in extension",
   "reactNative.configuration.properties.react-native-tools.reactNativeGlobalCommandName.description": "The command name to be used to execute React Native CLI commands.",
+  "reactNative.configuration.properties.react-native-tools.reactNativePackagerCommandName.description": "The command name to be used to start the React Native Packager.",
   "reactNative.configuration.properties.react-native-tools.consoleLogsColorTheme.description": "The color theme for Network inspector logs in VS Code DevTools console",
   "reactNative.configuration.properties.react-native-tools.displayDebuggingCommandsButton.description": "Whether to show the Debug button in the Editor Title area menu",
   "reactNative.configuration.properties.react-native-tools.showUserTips.description": "Whether to show tips about extension features"

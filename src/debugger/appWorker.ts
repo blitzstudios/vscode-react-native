@@ -142,7 +142,7 @@ var importScripts = (function(){
         var scriptCode = fs.readFileSync(scriptUrl, 'utf8');
         // Add a 'debugger;' statement to stop code execution
         // to wait for the sourcemaps to be processed by the debug adapter
-        vm.runInThisContext('debugger;' + scriptCode, {filename: scriptUrl});
+        vm.runInThisContext(scriptCode, {filename: scriptUrl});
     };
 })();
 `;

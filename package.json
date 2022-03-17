@@ -1,9 +1,9 @@
 {
   "name": "vscode-react-native",
-  "displayName": "React Native Tools",
-  "version": "1.10.0",
+  "displayName": "Sleeper React Native Tools",
+  "version": "1.0.0",
   "private": true,
-  "publisher": "msjsdiag",
+  "publisher": "sleeper",
   "icon": "resources/images/icon.png",
   "galleryBanner": {
     "color": "#3B3738",
@@ -14,11 +14,10 @@
     "react-native",
     "multi-root ready"
   ],
-  "bugs": "https://github.com/microsoft/vscode-react-native/issues",
   "license": "%reactNative.license%",
   "repository": {
     "type": "git",
-    "url": "https://github.com/microsoft/vscode-react-native"
+    "url": "https://github.com/blitzstudios/vscode-react-native"
   },
   "engines": {
     "vscode": "^1.46.0"
@@ -1156,6 +1155,11 @@
         },
         "react-native-tools.reactNativeGlobalCommandName": {
           "description": "%reactNative.configuration.properties.react-native-tools.reactNativeGlobalCommandName.description%",
+          "type": "string",
+          "scope": "resource"
+        },
+        "react-native-tools.reactNativePackagerCommandName": {
+          "description": "%reactNative.configuration.properties.react-native-tools.reactNativePackagerCommandName.description%",
           "type": "string",
           "scope": "resource"
         },

@@ -100,6 +100,10 @@ export class Packager {
         return this.packagerPort || SettingsHelper.getPackagerPort(this.workspacePath);
     }
 
+    public getReactNativePackagerCommandName(): string {
+        return SettingsHelper.getReactNativePackagerCommandName(this.workspacePath);
+    }
+
     public setRunOptions(runOptions: IRunOptions): void {
         this.runOptions = runOptions;
     }
@@ -225,11 +229,13 @@ export class Packager {
                 this.projectPath,
             );
 
+            const packagerCommand = this.getReactNativePackagerCommandName();
+
             const packagerSpawnResult = new CommandExecutor(
                 nodeModulesRoot,
                 this.projectPath,
                 this.logger,
-            ).spawnReactPackager(args, spawnOptions);
+            ).spawnReactPackager(packagerCommand, args, spawnOptions);
             this.packagerProcess = packagerSpawnResult.spawnedProcess;
 
             packagerSpawnResult.outcome.catch(() => {}); // We ignore all outcome errors
