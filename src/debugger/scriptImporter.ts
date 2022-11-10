@@ -4,6 +4,7 @@
 import path = require("path");
 import url = require("url");
 import { logger } from "vscode-debugadapter";
+import { OutputChannelLogger } from "../extension/log/OutputChannelLogger";
 import * as semver from "semver";
 import { Request } from "../common/node/request";
 import { ensurePackagerRunning } from "../common/packagerStatus";
@@ -36,6 +37,10 @@ export class ScriptImporter {
     private packagerRemoteRoot?: string;
     private packagerLocalRoot?: string;
     private sourceMapUtil: SourceMapUtil;
+    private logger2: OutputChannelLogger = OutputChannelLogger.getChannel(
+        OutputChannelLogger.MAIN_CHANNEL_NAME,
+        true,
+    );
 
     constructor(
         packagerAddress: string,
@@ -131,7 +136,7 @@ export class ScriptImporter {
             sourcesStoragePath,
             ScriptImporter.DEBUGGER_WORKER_FILENAME,
         );
-        logger.verbose(`About to download: ${debuggerWorkerURL} to: ${debuggerWorkerLocalPath}`);
+        this.logger2.info(`About to download: ${debuggerWorkerURL} to: ${debuggerWorkerLocalPath}`);
 
         const body = await Request.request(debuggerWorkerURL, true);
 
@@ -154,8 +159,10 @@ export class ScriptImporter {
             ) {
                 newPackager = "debugger-ui/";
             }
-            debuggerWorkerURL = `http://${this.packagerAddress}:${this.packagerPort}/${newPackager}${ScriptImporter.DEBUGGER_WORKER_FILENAME}`;
+            debuggerWorkerURL = `http://${this.packagerAddress}:${this.packagerPort}/${newPackager}static/js/debuggerWorker.c2fd040d.worker.js`;
         }
+        this.logger2.info(`debuggerWorkerUrlPath: ${debuggerWorkerUrlPath || ""}`);
+        this.logger2.info(`debuggerWorkerURL: ${debuggerWorkerURL}`);
         return debuggerWorkerURL;
     }
 
