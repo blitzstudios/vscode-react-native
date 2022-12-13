@@ -61,11 +61,7 @@ export class ScriptImporter {
         scriptUrlString: string,
         projectRootPath: string,
     ): Promise<DownloadedScript> {
-        const parsedScriptUrl = url.parse(scriptUrlString);
-        const overriddenScriptUrlString =
-            parsedScriptUrl.hostname === "localhost"
-                ? this.overridePackagerPort(scriptUrlString)
-                : scriptUrlString;
+        const overriddenScriptUrlString = scriptUrlString;
 
         // We'll get the source code, and store it locally to have a better debugging experience
         let scriptBody = await Request.request(overriddenScriptUrlString, true);
@@ -199,15 +195,5 @@ export class ScriptImporter {
             this.packagerLocalRoot,
         );
         return new FileSystem().writeFile(sourceMappingLocalPath, updatedContent);
-    }
-
-    /**
-     * Changes the port of the url to be the one configured as this.packagerPort
-     */
-    private overridePackagerPort(urlToOverride: string): string {
-        const components = url.parse(urlToOverride);
-        components.port = this.packagerPort.toString();
-        delete components.host; // We delete the host, if not the port change will be ignored
-        return url.format(components);
     }
 }

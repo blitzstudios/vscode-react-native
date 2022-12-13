@@ -164,12 +164,11 @@ export class ForkedAppWorker implements IDebuggeeWorker {
             // will take our modified bundle
             if (rnMessage.url) {
                 const packagerUrl = url.parse(rnMessage.url);
-                packagerUrl.host = `${this.packagerAddress}:${this.packagerPort}`;
                 rnMessage = {
                     ...rnMessage,
                     url: url.format(packagerUrl),
                 };
-                logger.verbose(
+                logger.error(
                     `Packager requested runtime to load script from ${String(rnMessage.url)}`,
                 );
                 const downloadedScript = await this.scriptImporter.downloadAppScript(
