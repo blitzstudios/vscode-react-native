@@ -168,7 +168,7 @@ export class ForkedAppWorker implements IDebuggeeWorker {
                     ...rnMessage,
                     url: url.format(packagerUrl),
                 };
-                logger.error(
+                logger.verbose(
                     `Packager requested runtime to load script from ${String(rnMessage.url)}`,
                 );
                 const downloadedScript = await this.scriptImporter.downloadAppScript(
