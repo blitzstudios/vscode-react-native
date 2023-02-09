@@ -45,7 +45,7 @@ export class SimulatorPlist {
     }
 
     public async findPlistFile(configuration?: string, productName?: string): Promise<string> {
-        const [bundleId, pathBuffer] = await Promise.all([
+        const [bundleId, bootedSimulators, basePathPromise] = await Promise.all([
             this.plistBuddy.getBundleId(
                 this.iosProjectRoot,
                 this.projectRoot,
@@ -55,25 +55,44 @@ export class SimulatorPlist {
                 productName,
                 this.scheme,
             ), // Find the name of the application
-            this.nodeChildProcess.exec("xcrun simctl getenv booted HOME").then(res => res.outcome), // Find the path of the simulator we are running
+            this.nodeChildProcess.exec(`xcrun simctl list | grep "(Booted)" | awk -F "[()]" '{print $2}' | tr '\n' ',' | sed 's/.$//'`).then(res => res.outcome), // Find the path of the simulator(s) we are running
+            this.nodeChildProcess.exec(`xcrun simctl getenv booted HOME`).then(res => res.outcome),
         ]);
-        const pathBefore = path.join(
-            pathBuffer.toString().trim(),
-            "Containers",
-            "Data",
-            "Application",
-        );
+
+        this.logger.info(`Booted Simulators: ${bootedSimulators}`);
+
+        const basePath = basePathPromise.substring(0, basePathPromise.indexOf("/Devices/") + 9);
+        let plistCandidates: string[] = [];
         const pathAfter = path.join("Library", "Preferences", `${bundleId}.plist`);
-        // Look through $SIMULATOR_HOME/Containers/Data/Application/*/Library/Preferences to find $BUNDLEID.plist
-        const apps = await this.nodeFileSystem.readDir(pathBefore);
-        this.logger.info(
-            `About to search for plist in base folder: ${pathBefore} pathAfter: ${pathAfter} in each of the apps: ${String(
-                apps,
-            )}`,
-        );
-        const plistCandidates = apps
-            .map((app: string) => path.join(pathBefore, app, pathAfter))
-            .filter(filePath => this.nodeFileSystem.existsSync(filePath));
+
+        for (const simulator of bootedSimulators.split(",")) {
+            const pathBefore = path.join(
+                basePath,
+                simulator.toString().trim(),
+                "data",
+                "Containers",
+                "Data",
+                "Application",
+            );
+
+            // Look through $SIMULATOR_HOME/Containers/Data/Application/*/Library/Preferences to find $BUNDLEID.plist
+            const apps = await this.nodeFileSystem.readDir(pathBefore);
+
+            plistCandidates = plistCandidates.concat(
+                apps
+                    .map((app: string) => {
+                        return path.join(pathBefore, app, pathAfter);
+                    })
+                    .filter(filePath => {
+                        const fileExists = this.nodeFileSystem.existsSync(filePath);
+                        if (fileExists) {
+                            this.logger.info(`Found plist: ${filePath}`);
+                        }
+                        return fileExists;
+                    }),
+            );
+        }
+
         if (plistCandidates.length === 0) {
             throw new Error(`Unable to find plist file for ${bundleId}`);
         } else if (plistCandidates.length > 1) {
@@ -87,6 +106,7 @@ export class SimulatorPlist {
                 ),
             );
         }
+
         return plistCandidates[0];
     }
 }
