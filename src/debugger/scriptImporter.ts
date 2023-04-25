@@ -64,7 +64,8 @@ export class ScriptImporter {
         const overriddenScriptUrlString = scriptUrlString;
 
         // We'll get the source code, and store it locally to have a better debugging experience
-        let scriptBody = await Request.request(overriddenScriptUrlString, true);
+        const isHttps = overriddenScriptUrlString.startsWith("https");
+        let scriptBody = await Request.request(overriddenScriptUrlString, true, isHttps);
 
         const rnVersions = await ProjectVersionHelper.getReactNativeVersions(projectRootPath);
         // unfortunatelly Metro Bundler is broken in RN 0.54.x versions, so use this workaround unless it will be fixed
@@ -107,7 +108,7 @@ export class ScriptImporter {
         }
         await waitForSourceMapping;
         const scriptFilePath = await this.writeAppScript(scriptBody, scriptUrl);
-        logger.verbose(`Script ${overriddenScriptUrlString} downloaded to ${scriptFilePath}`);
+        logger.log(`Script ${overriddenScriptUrlString} downloaded to ${scriptFilePath}`);
         return { contents: scriptBody, filepath: scriptFilePath };
     }
 
@@ -181,7 +182,8 @@ export class ScriptImporter {
         sourceMapUrl: IStrictUrl,
         scriptUrl: IStrictUrl,
     ): Promise<void> {
-        const sourceMapBody = await Request.request(sourceMapUrl.href, true);
+        const isHttps = sourceMapUrl.protocol === "https:";
+        const sourceMapBody = await Request.request(sourceMapUrl.href, true, isHttps);
         const sourceMappingLocalPath = path.join(
             this.sourcesStoragePath,
             path.basename(sourceMapUrl.pathname),

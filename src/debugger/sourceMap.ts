@@ -37,11 +37,10 @@ export class SourceMapUtil {
         // scriptUrl = "http://localhost:8081/index.ios.bundle?platform=ios&dev=true"
         const sourceMappingRelativeUrl = this.getSourceMapRelativeUrl(scriptBody); // sourceMappingRelativeUrl = "/index.ios.map?platform=ios&dev=true"
         if (sourceMappingRelativeUrl) {
-            const sourceMappingUrl = url.parse(sourceMappingRelativeUrl);
-            sourceMappingUrl.protocol = scriptUrl.protocol;
-            sourceMappingUrl.host = scriptUrl.host;
-            // parse() repopulates all the properties of the URL
-            result = <IStrictUrl>url.parse(url.format(sourceMappingUrl));
+            const basePath =
+                scriptUrl.href?.substring(0, scriptUrl.href?.lastIndexOf("/") + 1) || "";
+            const sourceMappingUrl = url.parse(basePath + sourceMappingRelativeUrl);
+            result = <IStrictUrl>sourceMappingUrl;
         }
 
         return result;
