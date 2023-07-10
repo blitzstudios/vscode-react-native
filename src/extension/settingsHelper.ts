@@ -26,6 +26,25 @@ export class SettingsHelper {
     }
 
     /**
+     * We get the packager arguments configured by the user
+     */
+    public static getPackagerArgs(fsPath: string): string[] {
+        const projectRoot = SettingsHelper.getReactNativeProjectRoot(fsPath);
+        const uri = vscode.Uri.file(projectRoot);
+        const workspaceConfiguration = vscode.workspace.getConfiguration(
+            "react-native.packager",
+            uri,
+        );
+        if (workspaceConfiguration.has("arguments")) {
+            const argumentString = ConfigurationReader.readString(
+                workspaceConfiguration.get("arguments"),
+            );
+            return argumentString.split(" ");
+        }
+        return [];
+    }
+
+    /**
      * Get logLevel setting
      */
     public static getLogLevel(): LogLevel {

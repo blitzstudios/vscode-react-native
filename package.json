@@ -1,7 +1,7 @@
 {
   "name": "vscode-react-native",
   "displayName": "Sleeper React Native Tools",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "private": true,
   "publisher": "sleeper",
   "icon": "resources/images/icon.png",
@@ -1141,6 +1141,11 @@
           "description": "%reactNative.configuration.properties.react-native.packager.port.description%",
           "type": "number",
           "default": 8081,
+          "scope": "resource"
+        },
+        "react-native.packager.arguments": {
+          "description": "%reactNative.configuration.properties.react-native.packager.arguments.description%",
+          "type": "string",
           "scope": "resource"
         },
         "react-native.packager.status-indicator": {

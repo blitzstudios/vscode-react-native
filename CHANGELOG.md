@@ -1,3 +1,6 @@
+## 3.3.0 (Sleeper)
+* Adding additional arguments for react-native packager
+
 ## 1.10.0
 * Update documentation for Hermes and Expo Hermes [#1827](https://github.com/microsoft/vscode-react-native/commit/9498893a1eb44e5d4af51251d25afe3d7be1295a)
 * Improve react-native packager output log and error message [#1811](https://github.com/microsoft/vscode-react-native/commit/4b9b406bce36747a151614c6537573a8e66e50aa)
