@@ -135,9 +135,15 @@ export class ScriptImporter {
         );
         this.logger2.info(`About to download: ${debuggerWorkerURL} to: ${debuggerWorkerLocalPath}`);
 
-        const body = await Request.request(debuggerWorkerURL, true);
+        let body = await Request.request(debuggerWorkerURL, true);
+        body = body.replace(
+            /debuggerWorker\.[\dA-Fa-f]+\.worker\.js\.map/g,
+            "debuggerWorker.js.map",
+        );
+        await new FileSystem().writeFile(debuggerWorkerLocalPath, body);
 
-        return new FileSystem().writeFile(debuggerWorkerLocalPath, body);
+        const map = await Request.request(`${debuggerWorkerURL}.map`, true);
+        return await new FileSystem().writeFile(`${debuggerWorkerLocalPath}.map`, map);
     }
 
     public prepareDebuggerWorkerURL(rnVersion: string, debuggerWorkerUrlPath?: string): string {
@@ -156,7 +162,7 @@ export class ScriptImporter {
             ) {
                 newPackager = "debugger-ui/";
             }
-            debuggerWorkerURL = `http://${this.packagerAddress}:${this.packagerPort}/${newPackager}static/js/debuggerWorker.c2fd040d.worker.js`;
+            debuggerWorkerURL = `http://${this.packagerAddress}:${this.packagerPort}/${newPackager}static/js/debuggerWorker.16cda763.worker.js`;
         }
         this.logger2.info(`debuggerWorkerUrlPath: ${debuggerWorkerUrlPath || ""}`);
         this.logger2.info(`debuggerWorkerURL: ${debuggerWorkerURL}`);
