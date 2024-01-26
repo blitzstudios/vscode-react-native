@@ -1,3 +1,6 @@
+## 4.0.0 (Sleeper)
+* Fixing reload command from react native dev settings.
+
 ## 3.3.0 (Sleeper)
 * Adding configurable arguments for react-native packager
 * Fixing issue where debuggerWorker source map was not downloaded.

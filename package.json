@@ -1,7 +1,7 @@
 {
   "name": "vscode-react-native",
-  "displayName": "Sleeper React Native Tools",
-  "version": "3.3.0",
+  "displayName": "React Native Tools (Sleeper)",
+  "version": "4.0.0",
   "private": true,
   "publisher": "sleeper",
   "icon": "resources/images/icon.png",
@@ -1367,6 +1367,6 @@
     "webpack-bundle-analyzer": "4.4.0"
   },
   "extensionDependencies": [
-    "ms-vscode.js-debug"
+    "ms-vscode.js-debug-nightly"
   ]
 }
