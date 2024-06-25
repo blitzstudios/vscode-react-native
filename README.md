@@ -3,17 +3,17 @@
 [![Build Status](https://dev.azure.com/vscode-webdiag-extensions/VS%20Code%20WebDiag%20extensions/_apis/build/status/%5BUnit%20tests%5D%20vscode-react-native%20%5Bmaster%5D?branchName=master)](https://dev.azure.com/vscode-webdiag-extensions/VS%20Code%20WebDiag%20extensions/_build/latest?definitionId=60&branchName=master)
 
 Stable:
-![Stable version](https://vsmarketplacebadge.apphb.com/version-short/msjsdiag.vscode-react-native.svg)
-![VS Marketplace rating](https://vsmarketplacebadge.apphb.com/rating-star/msjsdiag.vscode-react-native.svg)
+![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/msjsdiag.vscode-react-native?color=deep%20green&label=Version)
+![Visual Studio Marketplace Rating (Stars)](https://img.shields.io/visual-studio-marketplace/stars/msjsdiag.vscode-react-native?label=Rating)
 
 Preview:
-![VS Marketplace version](https://vsmarketplacebadge.apphb.com/version-short/msjsdiag.vscode-react-native-preview.svg)
-![VS Marketplace rating](https://vsmarketplacebadge.apphb.com/rating-star/msjsdiag.vscode-react-native-preview.svg)
+![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/msjsdiag.vscode-react-native-preview?color=deep%20green&label=Version)
+![Visual Studio Marketplace Rating (Stars)](https://img.shields.io/visual-studio-marketplace/stars/msjsdiag.vscode-react-native-preview?label=Rating)
 
 ## React Native Tools Preview
 
 The extension has a [nightly version](https://marketplace.visualstudio.com/items?itemName=msjsdiag.vscode-react-native-preview) which is released on a daily basis at 9 PM PST on each day that changes occur.
-To avoid conflicts, if both extensions are installed - the only stable version will be activated. So to use the preview version it is needed to disable or remove the stable version and reload VS Code.
+To avoid conflicts, if both extensions are installed - only stable version will be activated. So to use the preview version it is needed to disable or remove the stable version and reload VS Code.
 
 ## About the extension
 
@@ -30,8 +30,11 @@ Using this extension, you can **debug your code and quickly run `react-native` c
 - [About the extension](#about-the-extension)
 - [Getting started](#getting-started)
 - [React Native commands in the Command Palette](#react-native-commands-in-the-command-palette)
+- [Customize metro configuration](#customize-metro-configuration)
 - [Debugging React Native applications](#debugging-react-native-applications)
   - [Hermes engine](#hermes-engine)
+  - [Android applications](#android-applications)
+    - [Custom build for android apps](#custom-build-for-android-apps)
   - [iOS applications](#ios-applications)
     - [iOS devices](#ios-devices)
     - [Custom scheme for iOS apps](#custom-scheme-for-ios-apps)
@@ -40,15 +43,18 @@ Using this extension, you can **debug your code and quickly run `react-native` c
   - [Expo applications](#expo-applications)
     - [Debug on Expo Go](#debug-on-expo-go)
     - [Debug on expo-dev-client](#debug-on-expo-dev-client)
+    - [Debug on Expo Web](#debug-on-expo-web)
     - [Configuring Expo](#configuring-expo)
     - [Expo Hermes](#expo-hermes)
   - [Windows applications](#react-native-for-windows)
     - [Windows Hermes debugging](#windows-hermes-debugging)
   - [macOS applications](#react-native-for-macos)
     - [macOS Hermes debugging](#macos-hermes-debugging)
+  - [Debug out of React Native project directory](#debug-out-of-react-native-project-directory)
   - [TypeScript and Haul based applications](#typescript-and-haul)
   - [Debugger configuration properties](#debugger-configuration-properties)
 - [Customization](#customization)
+  - [Debug in vscode workspace](#debug-in-vscode-workspace)
   - [Logging](#logging)
   - [Build APK and generate bundle](#build-apk-and-generate-bundle)
   - [Specifying custom arguments for `react-native run-*` command](#specifying-custom-arguments-for-react-native-run--command)
@@ -90,30 +96,34 @@ The **Packager** commands allow you to start/stop the [**Metro Bundler**](https:
 
 The full list of commands is:
 
-| Name                                        | Command ID                           | Description                                                                                                                                                                                                                                |
-| ------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Launch Android Emulator                     | `reactNative.launchAndroidSimulator` | Prompts you to select the name of the available Android emulator and launch it. If only one emulator is installed in the system, it will be selected automatically                                                                         |
-| Launch iOS Simulator                        | `reactNative.launchIOSSimulator`     | Prompts you to select the available system version of the iOS simulator, then select the simulator name for the selected system and launch it. If only one simulator is installed in the system, it will be selected automatically         |
-| Run Android on Emulator                     | `reactNative.runAndroidSimulator`    | Run an Android application on Emulator. Launch order: check target platform support, load run arguments, start Packager, run app on the selected emulator. Make sure the `emulator` utility is added to `PATH`                             |
-| Run Android on Device                       | `reactNative.runAndroidDevice`       | Run an Android application on Device. Launch order: check target platform support, load run arguments, start Packager, run app in all connected devices                                                                                    |
-| Run iOS on Simulator                        | `reactNative.runIosSimulator`        | Run an iOS application on Simulator. Launch order: load run arguments, check target platform support, start Packager, run app in only one connected emulator                                                                               |
-| Run iOS on Device                           | `reactNative.runIosDevice`           | Run an iOS application on Device. Launch order: load run arguments, check target platform support, start Packager, run app in only one connected device                                                                                    |
-| Run Expo                                    | `reactNative.runExponent`            | Run an Exponent application. Launch order: login to exponent, load run arguments, start Packager, run app                                                                                                                                  |
-| Run Windows                                 | `reactNative.runWindows`             | Run a RNW application. Launch order: check target platform support, load run arguments, start Packager, run app                                                                                                                            |
-| Run MacOS                                   | `reactNative.runMacOS`               | Run a RNmacOS application. Launch order: check target platform support, load run arguments, start Packager, run app                                                                                                                        |
-| Start Packager                              | `reactNative.startPackager`          | Start Packager in context project workspace folder                                                                                                                                                                                         |
-| Stop Packager                               | `reactNative.stopPackager`           | Stop Packager                                                                                                                                                                                                                              |
-| Restart Packager                            | `reactNative.restartPackager`        | Restart Packager and clear the Packager's cache                                                                                                                                                                                            |
-| Publish To Expo                             | `reactNative.publishToExpHost`       | Publish to Exponent Host. Launch order: login to exponent, execute `Run Expo` command, then publish app to host                                                                                                                            |
-| Show Dev Menu                               | `reactNative.showDevMenu`            | Show development menu for running aplication on iOS or Android device or emulator                                                                                                                                                          |
-| ReloadApp                                   | `reactNative.reloadApp`              | Reload an application                                                                                                                                                                                                                      |
-| Run Element Inspector                       | `reactNative.runInspector`           | Load development tools for inspect application UI elements                                                                                                                                                                                 |
-| Stop Element Inspector                      | `reactNative.stopInspector`          | Stop development tools for inspect application UI elements                                                                                                                                                                                 |
-| Run React Native LogCat Monitor             | `reactNative.startLogCatMonitor`     | Creates a LogCat Monitor for the chosen online Android device to see the device LogCat logs. Default filtering arguments: ["*:S", "ReactNative:V", "ReactNativeJS:V"]. [How to configure filtering.](#configure-an-Android-LogCat-Monitor) |
-| Stop React Native LogCat Monitor            | `reactNative.stopLogCatMonitor`      | Stops an existing LogCat Monitor and removes its output channel                                                                                                                                                                            |
-| Run Network Inspector                       | `reactNative.startNetworkInspector`  | Run [Network inspector](#network-inspector)                                                                                                                                                                                                |
-| Stop Network Inspector                      | `reactNative.stopNetworkInspector`   | Stop [Network inspector](#network-inspector)                                                                                                                                                                                               |
-| Check development environment configuration | `reactNative.testDevEnvironment`     | Checks your development environment for common problems                                                                                                                                                                                    |
+| Name                                          | Command ID                            | Description                                                                                                                                                                                                                                |
+| --------------------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Launch Android Emulator                       | `reactNative.launchAndroidSimulator`  | Prompts you to select the name of the available Android emulator and launch it. If only one emulator is installed in the system, it will be selected automatically                                                                         |
+| Launch iOS Simulator                          | `reactNative.launchIOSSimulator`      | Prompts you to select the available system version of the iOS simulator, then select the simulator name for the selected system and launch it. If only one simulator is installed in the system, it will be selected automatically         |
+| Launch ExpoWeb                                | `reactNative.launchExpoWeb`           | Check if the current project is an Expo project. If so, lanuch ExpoWeb.                                                                                                                                                                    |
+| Run Android on Emulator                       | `reactNative.runAndroidSimulator`     | Run an Android application on Emulator. Launch order: check target platform support, load run arguments, start Packager, run app on the selected emulator. Make sure the `emulator` utility is added to `PATH`                             |
+| Run Android on Device                         | `reactNative.runAndroidDevice`        | Run an Android application on Device. Launch order: check target platform support, load run arguments, start Packager, run app in all connected devices                                                                                    |
+| Run iOS on Simulator                          | `reactNative.runIosSimulator`         | Run an iOS application on Simulator. Launch order: load run arguments, check target platform support, start Packager, run app in only one connected emulator                                                                               |
+| Run iOS on Device                             | `reactNative.runIosDevice`            | Run an iOS application on Device. Launch order: load run arguments, check target platform support, start Packager, run app in only one connected device                                                                                    |
+| Run Expo                                      | `reactNative.runExponent`             | Run an Exponent application. Launch order: login to exponent, load run arguments, start Packager, run app                                                                                                                                  |
+| Run Windows                                   | `reactNative.runWindows`              | Run a RNW application. Launch order: check target platform support, load run arguments, start Packager, run app                                                                                                                            |
+| Run MacOS                                     | `reactNative.runMacOS`                | Run a RNmacOS application. Launch order: check target platform support, load run arguments, start Packager, run app                                                                                                                        |
+| Start Packager                                | `reactNative.startPackager`           | Start Packager in context project workspace folder                                                                                                                                                                                         |
+| Stop Packager                                 | `reactNative.stopPackager`            | Stop Packager                                                                                                                                                                                                                              |
+| Restart Packager                              | `reactNative.restartPackager`         | Restart Packager and clear the Packager's cache                                                                                                                                                                                            |
+| Publish To Expo                               | `reactNative.publishToExpHost`        | Publish to Exponent Host. Launch order: login to exponent, execute `Run Expo` command, then publish app to host                                                                                                                            |
+| Show Dev Menu                                 | `reactNative.showDevMenu`             | Show development menu for running aplication on iOS or Android device or emulator                                                                                                                                                          |
+| ReloadApp                                     | `reactNative.reloadApp`               | Reload an application                                                                                                                                                                                                                      |
+| Run Element Inspector                         | `reactNative.runInspector`            | Load development tools for inspect application UI elements                                                                                                                                                                                 |
+| Stop Element Inspector                        | `reactNative.stopInspector`           | Stop development tools for inspect application UI elements                                                                                                                                                                                 |
+| Run React Native LogCat Monitor               | `reactNative.startLogCatMonitor`      | Creates a LogCat Monitor for the chosen online Android device to see the device LogCat logs. Default filtering arguments: ["*:S", "ReactNative:V", "ReactNativeJS:V"]. [How to configure filtering.](#configure-an-Android-LogCat-Monitor) |
+| Stop React Native LogCat Monitor              | `reactNative.stopLogCatMonitor`       | Stops an existing LogCat Monitor and removes its output channel                                                                                                                                                                            |
+| Run Network Inspector                         | `reactNative.startNetworkInspector`   | Run [Network inspector](#network-inspector)                                                                                                                                                                                                |
+| Stop Network Inspector                        | `reactNative.stopNetworkInspector`    | Stop [Network inspector](#network-inspector)                                                                                                                                                                                               |
+| Check development environment configuration   | `reactNative.testDevEnvironment`      | Checks your development environment for common problems                                                                                                                                                                                    |
+| Open the eas project in a web page            | `reactNative.openEASProjectInWebPage` | Open EAS build in your EAS project portal                                                                                                                                                                                                  |
+| Open react native upgrade helper in web page  | `reactNative.openRNUpgradeHelper`     | Open an official project upgrade tools in browser, support RN, RN for Windows, RN for MacOS                                                                                                                                                |
+| Revert extension input in open package module | `reactNative.revertOpenModule`        | Quickly revert some codes in Open Module which are changed by react-native-tools                                                                                                                                                           |
 
 ## Using commands in VS Code tasks
 
@@ -132,9 +142,15 @@ To run React Native Tools commands via VS Code tasks, you can create a `.vscode/
 }
 ```
 
+# Customize metro configuration
+
+Metro is a JavaScript bundler for React Native and include in React Native package. Metro configuration can be customized in `metro.config.js`.
+
+Note: From React Native 0.72.0, the config loading setup for Metro in React Native CLI(`@react-native/metro-config`).
+
 # Debugging React Native applications
 
-To start debugging create a new debug configuration for your ReactNative app in your `.vscode/launch.json`. Adding a new configuration can be done by opening your `launch.json` file and clicking on `Add Configuration...` button and then selecting `React Native` option. After that the extension will prompt you to create a debugging configuration by selecting debugging parameters in dropdown lists at the top of the editor. A new debugging configuration will be generated and added to the `launch.json` file automatically as shown in the image below.
+To start debugging create a new debug configuration for your ReactNative app in your `.vscode/launch.json`. Adding a new configuration can be done by opening your `launch.json` file and clicking on `Add Configuration...` button and then selecting `React Native` option. After that the extension will prompt you to create a debugging configuration by selecting debugging parameters in dropdown lists at the top of the editor. A new debugging configuration will be generated and added to the `launch.json` file automatically as shown in the image below. For Expo projects, please make sure choose `Application in direct mode(Hermes)` if you are using SDK 48 or a newer SDK.
 
 ![Add React Native debug configuration](resources/images/add-debug-configuration.gif)
 
@@ -168,7 +184,7 @@ The extension allows you to debug multiple devices and configurations, please re
 
 ## Hermes engine
 
-**Note**: Now react-native [0.70.0](https://github.com/facebook/react-native/releases/tag/v0.70.0) set Hermes as default engine to instead of JSCore. Please see [official documentation](https://reactnative.dev/blog/2022/07/08/hermes-as-the-default) to get details.
+From [0.70.0](https://github.com/facebook/react-native/releases/tag/v0.70.0), react-native set Hermes as default engine. Please see [official documentation](https://reactnative.dev/blog/2022/07/08/hermes-as-the-default) to get details.
 
 The Hermes engine is an open source JavaScript engine created by Facebook to optimize building and running React Native applications. It improves app performance and decreases app size.
 
@@ -216,6 +232,18 @@ To attach to a running Hermes application use `Attach to Hermes application - Ex
 }
 ```
 
+## Android applications
+
+### Custom build for Android apps
+
+If you want to use a custom `applicationIdSuffix` for your application to launch specific build, you can either pass it as part of the `runArguments` parameter arguments as shown below:
+
+```js
+"runArguments": ["--appIdSuffix", "customAppIdSuffix", ...]
+// or
+"runArguments": ["--appIdSuffix=customAppIdSuffix", ...]
+```
+
 ## iOS applications
 
 ### iOS devices
@@ -230,14 +258,12 @@ Debugging on an iOS device requires following manual steps:
 
 ### Custom scheme for iOS apps
 
-If you want to use a custom scheme for your application you can either pass it as part of the `runArguments` parameter arguments, or set the `scheme` configuration parameter as shown below:
+If you want to use a custom scheme for your application you can either pass it as part of the `runArguments` parameter arguments as shown below:
 
 ```js
 "runArguments": ["--scheme", "customScheme", ...]
 // or
 "runArguments": ["--scheme=customScheme", ...]
-// or
-"scheme" : "customScheme"
 ```
 
 Please be aware, specifying the scheme value as a part of the `runArguments` parameter arguments will override the `scheme` configuration parameter value, if it set.
@@ -346,9 +372,9 @@ If you want to debug Expo app using [expo-dev-client](https://docs.expo.dev/deve
 ```json
     "configurations": [
         {
-            "name": "Attach to packager",
+            "name": "Attach to Hermes application",
             "request": "attach",
-            "type": "reactnative",
+            "type": "reactnativedirect",
             "cwd": "${workspaceFolder}"
         }
     ]
@@ -356,9 +382,33 @@ If you want to debug Expo app using [expo-dev-client](https://docs.expo.dev/deve
 
 9. Run `Attach` command in debug tab and debugger will start to work(If debugger not go into breakpoint, you need to reload app from Metro to refresh app since maybe it had some conflicts between Browser devtools debug session and RNT debug session).
 
+### Debug on Expo Web
+
+Expo support open application in browser, the expo web application is generated by [react-native-web](https://necolas.github.io/react-native-web/). It can help user open application without any Android emulator, iOS simulator or device. React-native-tools supports debugging Expo Web application in Chrome and Edge. Follow below steps to start Expo Web debugging:
+
+1. Open your project in VS Code with this extension installed.
+2. Check and install related package: `react-dom`, `react-native-web` and `@expo/webpack-config` (this package is deprecated from Expo 49) by `npx expo install` command.
+3. Add Expo Web debugging configure in `launch.json`:
+
+```json
+    "configurations": [
+       {
+            "name": "Debug Expo Web - Experimental",
+            "request": "launch",
+            "type": "reactnativedirect",
+            "cwd": "${workspaceFolder}",
+            "platform": "expoweb",
+            "browserTarget": "chrome",
+            "url": "http://localhost:8081"
+        }
+    ]
+```
+
+4. Execute and start debugging
+
 ### Configuring Expo
 
-The extension supports running through Exponent not just the applications created with Expo but even pure React Native applications (in that case you need to add `expo` package to `node_modules` in order to make it work with Expo: `npm install expo --save-dev`. In either cases it uses `app.json` configuration file in the root of the project.
+The extension supports running through Exponent not just the applications created with Expo but even pure React Native applications (in that case you need to add `expo` package to `node_modules` in order to make it work with Expo: `npm install expo --save-dev`. In either cases it uses `app.json` configuration file in the root of the project.)
 
 If you are running `Debug in Exponent` configuration or any of pallette commands like `Run in Exponent`, `Publish to Exponent` then this file will be created automatically if absent or updated with the following basic configuration section:
 
@@ -384,7 +434,7 @@ If you want to change your app entrypoint (for example, from `index.js` to `inde
 
 ### Expo Hermes
 
-Expo app is supporting Hermes Engine.
+Expo app is supporting Hermes Engine, and please note that Hermes engine is the default Javascript engine used by Expo since SDK 48. SDK 47 and lower version will no longer be supported in the next release. (Please refer to https://docs.expo.dev/guides/using-hermes/) We suggest everyone to upgrade your Expo projects to use Expo 48 or newer SDKs.
 
 You can add or remove `"jsEngine": "hermes"` in `app.json` to enable or disable Hermes Engine. And any changes for app engine you need to run `eas build` to rebuild your application.
 
@@ -496,6 +546,67 @@ To debug a macOS Hermes application you can use `Debug macOS Hermes - Experiment
 }
 ```
 
+## Debug out of React Native project directory
+
+If your project structure like this:
+
+```
+common
+- utils.ts
+app
+- src/
+- metro.config.js
+```
+
+When you import `utils.ts` in your project. Using
+
+```js
+import { commonFunction } from "../../common/utils";
+```
+
+Will get error when start Metro:
+
+```
+error: bundling failed: Error: Unable to resolve module `../../common/utils` from `src/App.js`
+```
+
+To import files in `metro.config.js`, user can debug code out of react native project.
+
+1. Add extra module and watch folder for the file parent folder.
+
+```js
+const extraNodeModules = {
+  common: path.resolve(__dirname + "/../common"),
+};
+const watchFolders = [path.resolve(__dirname + "/../common")];
+```
+
+2. Add module and watch folder in metro config.
+
+```js
+// React native <= 0.72.0
+module.exports = {
+  resolver: {
+    extraNodeModules,
+  },
+  watchFolders,
+};
+
+// React native >= 0.72.0
+const config = {
+  resolver: {
+    extraNodeModules,
+  },
+  watchFolders,
+};
+```
+
+3. After mapping common key to common/ path, we can include any files inside common/ relative to this path. Metro is started, launching or debugging is working well.
+
+```js
+import { commonFunction } from "common/utils";
+```
+
 ## TypeScript and Haul
 
 ### Sourcemaps
@@ -567,10 +678,29 @@ The following is a list of all the configuration properties the debugger accepts
 | `variant`                          | A variant to be passed to `react-native run-android`, e.g. use `devDebug` to specify `--variant=devDebug`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | `string`   | n/a                                           |
 | `scheme`                           | A scheme name to be passed to `react-native run-ios`, e.g. `devDebug` to specify `--scheme=devDebug`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | `string`   | n/a                                           |
 | `productName`                      | iOS bundle display name e.g. `AwesomeProject` value means that the extension will search for `AwesomeProject.app` bundle                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | `string`   | n/a                                           |
+| `jsDebugTrace`                     | Enable trace collection for depended extension `vscode-js-debug`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | `boolean`  | n/a                                           |
 
 # Customization
 
 The extension can be further customized for other React Native scenarios. These are the most common:
+
+## Debug in vscode workspace
+
+Extension supports vscode multiple root workspace for development. If you have several react-native project in workspace, extension will show project selection list when react-native packager is starting. Also you can add settings in workspace to ignore specific project in selection list.
+
+- Open vscode command palette, select `Preferences: Open Workspace Settings (JSON)` to open workspace settings file.
+- Add below settings in the file:
+
+```
+	"settings": {
+		"react-native.workspace.exclude": [
+			"ProjectFolderName1",
+			"ProjectFolderName2"
+		]
+	}
+```
+
+- Since the folder selection list is handled by vscode rather than extension, we must set exclude folder when extension is not activated. If you add exclude folder after extension activating, you must re-activate you extension or reopen your vscode.
 
 ## Logging
 
@@ -724,8 +854,19 @@ If you use Android, you need to change the debug server by:
 5. (Hermes only) Hermes engine listens port 8081 for debugging by default, to change it you might need to modify your [`metro.config.js` file adding `"port": portNumber` argument in there to the server settings](https://facebook.github.io/metro/docs/configuration/#port).
 
 ```js
-// Example of metro.config.js
+// Example of metro.config.js (<= 0.72.0)
 module.exports = {
+  server: {
+    port: 9091,
+  },
+};
+```
+
+OR
+
+```js
+// Example of metro.config.js (0.72.0)
+const config = {
   server: {
     port: 9091,
   },
@@ -921,18 +1062,19 @@ The extension provides “Dark” and “Light” color themes for Network Inspe
 
 # Developing inside a Docker Container
 
-The extension supports [VS Code Remote Development](https://code.visualstudio.com/docs/remote/remote-overview) features on Linux. Please follow the [VS Code official documentation](https://code.visualstudio.com/docs/remote/containers) to setup your environment to use a remote development approach.
+The extension supports [VS Code Remote Development](https://code.visualstudio.com/docs/remote/remote-overview) features on Linux. Please follow the [VS Code official documentation](https://code.visualstudio.com/docs/devcontainers/containers) to setup your environment and install related extensions([Remote Development](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack) is recommended) to use a remote development approach.
 
 You can use [official React Native Docker image](https://hub.docker.com/r/reactnativecommunity/react-native-android) provided by the [react-native-community](https://github.com/react-native-community/docker-android).
 
 Here are the steps to run React Native debugging inside a Docker Container on a real Android device:
 
-1. Open Command Palette and run the following command
+1. In the local react-native project, add `Dev Container` configure folder and files:
    ```
-   Remote-Containers: Add Development Container Configuration Files...
+   .devcontainer
+     -devcontainer.json
+     -Dockerfile
    ```
-   Then select `Existing Dockerfile` to create `.devcontainer/devcontainer.json` configuration file.
-1. Сreate Dockerfile extending [reactnativecommunity/react-native-android image](https://hub.docker.com/r/reactnativecommunity/react-native-android). For example you can use the following Dockerfile:
+2. Сreate Dockerfile extending [reactnativecommunity/react-native-android image](https://hub.docker.com/r/reactnativecommunity/react-native-android). For example you can use the following Dockerfile:
 
    ```
    FROM reactnativecommunity/react-native-android:latest
@@ -940,7 +1082,7 @@ Here are the steps to run React Native debugging inside a Docker Container on a 
    RUN npm install -g expo-cli react-native-cli
    ```
 
-1. Configure your `devcontainer.json` file as needed. Below is a sample configuration:
+3. Configure your `devcontainer.json` file as needed. Below is a sample configuration:
 
    ```json
    {
@@ -960,21 +1102,23 @@ Here are the steps to run React Native debugging inside a Docker Container on a 
        "-v",
        "/dev/bus/usb:/dev/bus/usb" // mount connected USB devices to a container
      ],
-
-     "settings": {
-       // This will ignore your local shell user setting for Linux since shells like zsh are typically
-       // not in base container images. You can also update this to an specific shell to ensure VS Code
-       // uses the right one for terminals and tasks. For example, /bin/bash (or /bin/ash for Alpine).
-       "terminal.integrated.shell.linux": null
-     },
-
-     // Add the IDs of extensions you want installed when the container is created in the array below.
-     "extensions": ["msjsdiag.vscode-react-native"]
+     "customizations": {
+       "vscode": {
+         "settings": {
+           // This will ignore your local shell user setting for Linux since shells like zsh are typically
+           // not in base container images. You can also update this to an specific shell to ensure VS Code
+           // uses the right one for terminals and tasks. For example, /bin/bash (or /bin/ash for Alpine).
+           "terminal.integrated.shell.linux": null
+         },
+         // Add the IDs of extensions you want installed when the container is created in the array below.
+         "extensions": ["msjsdiag.vscode-react-native"]
+       }
+     }
    }
    ```
 
-1. Open Command Palette and run the following command `Remote-Containers: Open Folder in Container` to reopen your project in a container
-1. Connect your device via USB and start debugging the same way as on local machine.
+4. Open Command Palette and run the following command `Dev Containers: Open Folder in Container` to reopen your project in a container
+5. Connect your device via USB and start debugging the same way as on local machine.
 
 Currently the above scenario doesn't work on macOS and Windows. Docker Container implementation on these OS uses Virtual Machine tools which may have problems with USB forwarding for mobile devices.
 

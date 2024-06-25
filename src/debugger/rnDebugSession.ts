@@ -4,7 +4,7 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import * as mkdirp from "mkdirp";
-import { logger } from "vscode-debugadapter";
+import { logger } from "@vscode/debugadapter";
 import { DebugProtocol } from "vscode-debugprotocol";
 import * as nls from "vscode-nls";
 import { ProjectVersionHelper } from "../common/projectVersionHelper";
@@ -12,6 +12,7 @@ import { TelemetryHelper } from "../common/telemetryHelper";
 import { RnCDPMessageHandler } from "../cdp-proxy/CDPMessageHandlers/rnCDPMessageHandler";
 import { ErrorHelper } from "../common/error/errorHelper";
 import { InternalErrorCode } from "../common/error/internalErrorCode";
+import { ReactNativeProjectHelper } from "../common/reactNativeProjectHelper";
 import { MultipleLifetimesAppWorker } from "./appWorker";
 import {
     DebugSessionBase,
@@ -56,6 +57,9 @@ export class RNDebugSession extends DebugSessionBase {
     ): Promise<void> {
         try {
             try {
+                if (launchArgs.platform != "exponent") {
+                    await ReactNativeProjectHelper.verifyMetroConfigFile(launchArgs.cwd);
+                }
                 await this.initializeSettings(launchArgs);
                 logger.log("Launching the application");
                 logger.verbose(`Launching the application: ${JSON.stringify(launchArgs, null, 2)}`);

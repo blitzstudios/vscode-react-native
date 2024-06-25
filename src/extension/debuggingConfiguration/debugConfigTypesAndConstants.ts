@@ -33,6 +33,11 @@ export const DEBUG_TYPES = {
     REACT_NATIVE_DIRECT: "reactnativedirect",
 };
 
+export enum BROWSER_TYPES {
+    Chrome = "chrome",
+    Edge = "edge",
+}
+
 export const platformTypeRunPickConfig: DebugConfigurationQuickPickItem[] = [
     {
         label: "Android",
@@ -58,11 +63,15 @@ export const platformTypeDebugPickConfig: DebugConfigurationQuickPickItem[] = [
         label: "Exponent",
         type: PlatformType.Exponent,
     },
+    {
+        label: "ExpoWeb",
+        type: PlatformType.ExpoWeb,
+    },
 ];
 
 export const platformTypeDirectPickConfig: DebugConfigurationQuickPickItem[] = [
     {
-        label: "Hermes engine - Experimental",
+        label: "Hermes engine",
         type: "",
     },
     {
@@ -73,12 +82,23 @@ export const platformTypeDirectPickConfig: DebugConfigurationQuickPickItem[] = [
 
 export const appTypePickConfig: DebugConfigurationQuickPickItem[] = [
     {
-        label: "Application in direct mode",
+        label: "Application in direct mode(Hermes)",
         type: DEBUG_TYPES.REACT_NATIVE_DIRECT,
     },
     {
         label: "Classic application",
         type: DEBUG_TYPES.REACT_NATIVE,
+    },
+];
+
+export const browserTypePickConfig: DebugConfigurationQuickPickItem[] = [
+    {
+        label: "Chrome",
+        type: BROWSER_TYPES.Chrome,
+    },
+    {
+        label: "Edge",
+        type: BROWSER_TYPES.Edge,
     },
 ];
 
@@ -121,7 +141,7 @@ export const expoHostTypePickConfig: DebugConfigurationQuickPickItem[] = [
 ];
 
 export const DEBUG_CONFIGURATION_NAMES = {
-    ATTACH_TO_HERMES_APPLICATION_EXPERIMENTAL: "Attach to Hermes application - Experimental",
+    ATTACH_TO_HERMES_APPLICATION: "Attach to Hermes application",
     ATTACH_TO_DIRECT_IOS_EXPERIMENTAL: "Attach to Direct iOS - Experimental",
     ATTACH_TO_PACKAGER: "Attach to packager",
     DEBUG_ANDROID: "Debug Android",
@@ -129,21 +149,23 @@ export const DEBUG_CONFIGURATION_NAMES = {
     DEBUG_WINDOWS: "Debug Windows",
     DEBUG_MACOS: "Debug macOS",
     DEBUG_IN_EXPONENT: "Debug in Exponent",
-    DEBUG_ANDROID_HERMES_EXPERIMENTAL: "Debug Android Hermes - Experimental",
+    DEBUG_ANDROID_HERMES: "Debug Android Hermes",
     DEBUG_DIRECT_IOS_EXPERIMENTAL: "Debug Direct iOS - Experimental",
-    DEBUG_IOS_HERMES_EXPERIMENTAL: "Debug iOS Hermes - Experimental",
+    DEBUG_IOS_HERMES: "Debug iOS Hermes",
     DEBUG_MACOS_HERMES_EXPERIMENTAL: "Debug macOS Hermes - Experimental",
     DEBUG_WINDOWS_HERMES_EXPERIMENTAL: "Debug Windows Hermes - Experimental",
     RUN_ANDROID: "Run Android",
     RUN_IOS: "Run iOS",
-    RUN_ANDROID_HERMES_EXPERIMENTAL: "Run Android Hermes - Experimental",
-    RUN_IOS_HERMES_EXPERIMENTAL: "Run iOS Hermes - Experimental",
+    RUN_ANDROID_HERMES: "Run Android Hermes",
+    RUN_IOS_HERMES: "Run iOS Hermes",
     RUN_DIRECT_IOS_EXPERIMENTAL: "Run Direct iOS - Experimental",
+    DEBUG_IN_EXPONENT_HERMES_EXPERIMENTAL: "Debug in Hermes Exponent - Experimental",
+    DEBUG_IN_EXPONENT_WEB_EXPERIMENTAL: "Debug in Exponent Web - Experimental",
 };
 
 export const debugConfigurations: Record<string, vscode.DebugConfiguration> = {
-    [DEBUG_CONFIGURATION_NAMES.ATTACH_TO_HERMES_APPLICATION_EXPERIMENTAL]: {
-        name: DEBUG_CONFIGURATION_NAMES.ATTACH_TO_HERMES_APPLICATION_EXPERIMENTAL,
+    [DEBUG_CONFIGURATION_NAMES.ATTACH_TO_HERMES_APPLICATION]: {
+        name: DEBUG_CONFIGURATION_NAMES.ATTACH_TO_HERMES_APPLICATION,
         cwd: "${workspaceFolder}",
         type: DEBUG_TYPES.REACT_NATIVE_DIRECT,
         request: "attach",
@@ -198,8 +220,8 @@ export const debugConfigurations: Record<string, vscode.DebugConfiguration> = {
         request: "launch",
         platform: PlatformType.Exponent,
     },
-    [DEBUG_CONFIGURATION_NAMES.DEBUG_ANDROID_HERMES_EXPERIMENTAL]: {
-        name: DEBUG_CONFIGURATION_NAMES.DEBUG_ANDROID_HERMES_EXPERIMENTAL,
+    [DEBUG_CONFIGURATION_NAMES.DEBUG_ANDROID_HERMES]: {
+        name: DEBUG_CONFIGURATION_NAMES.DEBUG_ANDROID_HERMES,
         cwd: "${workspaceFolder}",
         type: DEBUG_TYPES.REACT_NATIVE_DIRECT,
         request: "launch",
@@ -215,8 +237,8 @@ export const debugConfigurations: Record<string, vscode.DebugConfiguration> = {
         target: "device",
         port: IWDPHelper.iOS_WEBKIT_DEBUG_PROXY_DEFAULT_PORT, // 9221
     },
-    [DEBUG_CONFIGURATION_NAMES.DEBUG_IOS_HERMES_EXPERIMENTAL]: {
-        name: DEBUG_CONFIGURATION_NAMES.DEBUG_IOS_HERMES_EXPERIMENTAL,
+    [DEBUG_CONFIGURATION_NAMES.DEBUG_IOS_HERMES]: {
+        name: DEBUG_CONFIGURATION_NAMES.DEBUG_IOS_HERMES,
         cwd: "${workspaceFolder}",
         type: DEBUG_TYPES.REACT_NATIVE_DIRECT,
         request: "launch",
@@ -252,16 +274,16 @@ export const debugConfigurations: Record<string, vscode.DebugConfiguration> = {
         platform: PlatformType.iOS,
         enableDebug: false,
     },
-    [DEBUG_CONFIGURATION_NAMES.RUN_ANDROID_HERMES_EXPERIMENTAL]: {
-        name: DEBUG_CONFIGURATION_NAMES.RUN_ANDROID_HERMES_EXPERIMENTAL,
+    [DEBUG_CONFIGURATION_NAMES.RUN_ANDROID_HERMES]: {
+        name: DEBUG_CONFIGURATION_NAMES.RUN_ANDROID_HERMES,
         cwd: "${workspaceFolder}",
         type: DEBUG_TYPES.REACT_NATIVE_DIRECT,
         request: "launch",
         platform: PlatformType.Android,
         enableDebug: false,
     },
-    [DEBUG_CONFIGURATION_NAMES.RUN_IOS_HERMES_EXPERIMENTAL]: {
-        name: DEBUG_CONFIGURATION_NAMES.RUN_IOS_HERMES_EXPERIMENTAL,
+    [DEBUG_CONFIGURATION_NAMES.RUN_IOS_HERMES]: {
+        name: DEBUG_CONFIGURATION_NAMES.RUN_IOS_HERMES,
         cwd: "${workspaceFolder}",
         type: DEBUG_TYPES.REACT_NATIVE_DIRECT,
         request: "launch",
@@ -277,5 +299,19 @@ export const debugConfigurations: Record<string, vscode.DebugConfiguration> = {
         enableDebug: false,
         useHermesEngine: false,
         target: "device",
+    },
+    [DEBUG_CONFIGURATION_NAMES.DEBUG_IN_EXPONENT_HERMES_EXPERIMENTAL]: {
+        name: DEBUG_CONFIGURATION_NAMES.DEBUG_IN_EXPONENT_HERMES_EXPERIMENTAL,
+        cwd: "${workspaceFolder}",
+        type: DEBUG_TYPES.REACT_NATIVE_DIRECT,
+        request: "launch",
+        platform: PlatformType.Exponent,
+    },
+    [DEBUG_CONFIGURATION_NAMES.DEBUG_IN_EXPONENT_WEB_EXPERIMENTAL]: {
+        name: DEBUG_CONFIGURATION_NAMES.DEBUG_IN_EXPONENT_WEB_EXPERIMENTAL,
+        cwd: "${workspaceFolder}",
+        type: DEBUG_TYPES.REACT_NATIVE_DIRECT,
+        request: "launch",
+        platform: PlatformType.ExpoWeb,
     },
 };

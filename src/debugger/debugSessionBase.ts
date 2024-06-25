@@ -4,7 +4,7 @@
 import * as path from "path";
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { LoggingDebugSession, Logger, logger, ErrorDestination } from "vscode-debugadapter";
+import { LoggingDebugSession, Logger, logger, ErrorDestination } from "@vscode/debugadapter";
 import { DebugProtocol } from "vscode-debugprotocol";
 import * as nls from "vscode-nls";
 import { stripJsonTrailingComma } from "../common/utils";
@@ -68,6 +68,8 @@ export interface IAttachRequestArgs
     skipFiles?: [];
     sourceMaps?: boolean;
     sourceMapPathOverrides?: { [key: string]: string };
+    jsDebugTrace?: boolean;
+    browserTarget?: string;
 }
 
 export interface ILaunchRequestArgs
@@ -123,6 +125,27 @@ export abstract class DebugSessionBase extends LoggingDebugSession {
         response.body.supportsEvaluateForHovers = true;
         response.body.supportTerminateDebuggee = true;
         response.body.supportsCancelRequest = true;
+
+        response.body.exceptionBreakpointFilters = [
+            {
+                filter: "all",
+                label: "Caught Exceptions",
+                default: false,
+                supportsCondition: true,
+                description: "Breaks on all throw errors, even if they're caught later.",
+                // eslint-disable-next-line @typescript-eslint/quotes
+                conditionDescription: 'error.name == "MyError"',
+            },
+            {
+                filter: "uncaught",
+                label: "Uncaught Exceptions",
+                default: false,
+                supportsCondition: true,
+                description: "Breaks only on errors or promise rejections that are not handled.",
+                // eslint-disable-next-line @typescript-eslint/quotes
+                conditionDescription: 'error.name == "MyError"',
+            },
+        ];
 
         this.sendResponse(response);
     }
@@ -183,6 +206,10 @@ export abstract class DebugSessionBase extends LoggingDebugSession {
                 this.appLauncher.updateDebugConfigurationRoot(
                     this.vsCodeDebugSession.workspaceFolder.uri.fsPath,
                 );
+            }
+            const settingsPort = this.appLauncher.getPackagerPort(projectRootPath);
+            if (this.appLauncher.getPackager().getPort() != settingsPort) {
+                this.appLauncher.getPackager().resetToSettingsPort();
             }
         }
     }

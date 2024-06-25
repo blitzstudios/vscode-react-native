@@ -45,6 +45,24 @@ export class JsDebugConfigAdapter {
         });
     }
 
+    public static createChromeDebuggingConfig(
+        attachArgs: IAttachRequestArgs,
+        cdpProxyPort: number,
+        pwaSessionName: string,
+        sessionId: string,
+    ): any {
+        const extraArgs: any = {};
+
+        return Object.assign({}, this.getExistingExtraArgs(attachArgs), extraArgs, {
+            type: pwaSessionName,
+            request: "attach",
+            name: "Attach",
+            port: cdpProxyPort,
+            webRoot: attachArgs.cwd,
+            rnDebugSessionId: sessionId,
+        });
+    }
+
     private static getExistingExtraArgs(attachArgs: IAttachRequestArgs): any {
         const existingExtraArgs: any = {};
         if (attachArgs.env) {
@@ -60,6 +78,9 @@ export class JsDebugConfigAdapter {
         }
         if (attachArgs.skipFiles) {
             existingExtraArgs.skipFiles = attachArgs.skipFiles;
+        }
+        if (attachArgs.jsDebugTrace) {
+            existingExtraArgs.trace = attachArgs.jsDebugTrace;
         }
 
         return existingExtraArgs;

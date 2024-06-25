@@ -1,12 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 import * as path from "path";
+import * as fs from "fs";
 import * as vscode from "vscode";
+import stripJsonComments = require("strip-json-comments");
 import { ConfigurationReader } from "../common/configurationReader";
 import { Packager } from "../common/packager";
 import { SystemColorTheme } from "../common/editorColorThemesHelper";
 import { LogLevel } from "./log/LogHelper";
 import { PackagerStatusIndicator } from "./packagerStatusIndicator";
+import { stripJsonTrailingComma } from "../../src/common/utils";
 
 export class SettingsHelper {
     /**
@@ -239,5 +242,47 @@ export class SettingsHelper {
         if (workspaceConfiguration.has("showUserTips")) {
             await workspaceConfiguration.update("showUserTips", showTips, true);
         }
+    }
+
+    public static async getWorkspaceFileExcludeFolder(
+        settingsPath: string | undefined,
+    ): Promise<any> {
+        // Handle non-workspace project and untitled workspace
+        if (!settingsPath || !fs.existsSync(settingsPath)) {
+            return [];
+        }
+        // Get workspace settings
+        const workspaceSettingsContent = stripJsonTrailingComma(
+            stripJsonComments(fs.readFileSync(settingsPath, "utf-8")),
+        );
+        if (workspaceSettingsContent) {
+            if (workspaceSettingsContent.settings) {
+                const exclude = workspaceSettingsContent.settings["react-native.workspace.exclude"];
+                return exclude ? exclude : [];
+            }
+            return [];
+        }
+        return [];
+    }
+
+    public static getWorkspaceTelemetry() {
+        const workspaceConfiguration = vscode.workspace.getConfiguration("telemetry", null);
+        if (workspaceConfiguration.has("optIn")) {
+            return workspaceConfiguration.get("optIn");
+        }
+        return "";
+    }
+
+    public static getShowIndicator(): boolean {
+        const workspaceConfiguration = vscode.workspace.getConfiguration(
+            "react-native-tools",
+            null,
+        );
+        if (workspaceConfiguration.has("showPackagerIndicator")) {
+            return ConfigurationReader.readBoolean(
+                workspaceConfiguration.get("showPackagerIndicator"),
+            );
+        }
+        return true;
     }
 }

@@ -138,6 +138,30 @@ export const ERROR_STRINGS = {
         "FailedToRunExponent",
         "Failed to publish the application to Exponent",
     ),
+    [InternalErrorCode.FailedToConfigEASBuild]: localize(
+        "FailedToConfigEASBuild",
+        "Failed to config Expo app with EAS build",
+    ),
+    [InternalErrorCode.FailedToOpenProjectPage]: localize(
+        "FailedToOpenProjectPage",
+        "Failed to open EAS project in web page",
+    ),
+    [InternalErrorCode.FailedToLaunchExpoWeb]: localize(
+        "FailedToLaunchExpoWeb",
+        "Failed to launch ExpoWeb",
+    ),
+    [InternalErrorCode.FailedToRevertOpenModule]: localize(
+        "FailedToRevertOpenModule",
+        "Failed to revert Open module",
+    ),
+    [InternalErrorCode.FailedToOpenRNUpgradeHelper]: localize(
+        "FailedToOpenRNUpgradeHelper",
+        "Failed to open react native upgrade helper",
+    ),
+    [InternalErrorCode.FailedToInstallExpoGo]: localize(
+        "FailedToInstallExpoGo",
+        "Failed to download and install Expo Go application",
+    ),
     [InternalErrorCode.FailedToStartPackager]: localize(
         "FailedToStartPackager",
         "Failed to start the React Native packager",
@@ -382,5 +406,17 @@ export const ERROR_STRINGS = {
     [InternalErrorCode.UserInputCanceled]: localize(
         "UserInputCanceled",
         "User canceled data entry",
+    ),
+    [InternalErrorCode.FailedToRunPrebuild]: localize(
+        "FailedToRunPrebuild",
+        "Failed to run prebuild",
+    ),
+    [InternalErrorCode.FailedToRunPrebuildClean]: localize(
+        "FailedToRunPrebuildClean",
+        "Failed to run prebuild clean",
+    ),
+    [InternalErrorCode.FailedToReopenQRCode]: localize(
+        "FailedToReopenQRCode",
+        "Failed to reopen QR code",
     ),
 };

@@ -5,11 +5,12 @@
 /// <reference path="exponentHelper.d.ts" />
 
 import * as path from "path";
+import * as fs from "fs";
 import * as semver from "semver";
 import * as vscode from "vscode";
 import { sync as globSync } from "glob";
 import * as nls from "vscode-nls";
-import { logger } from "vscode-debugadapter";
+import { logger } from "@vscode/debugadapter";
 import { stripJsonTrailingComma, getNodeModulesGlobalPath } from "../../common/utils";
 import { Package, IPackageInformation } from "../../common/node/package";
 import { ProjectVersionHelper } from "../../common/projectVersionHelper";
@@ -78,6 +79,18 @@ export class ExponentHelper {
         this.logger.logStream(
             localize("CheckingIfThisIsExpoApp", "Checking if this is an Expo app."),
         );
+        this.logger.logStream("\n");
+
+        const packageJson = await this.getAppPackageInformation();
+        if (!packageJson.name || !packageJson.version) {
+            this.logger.warning(
+                localize(
+                    "MissingFieldsInExpoApp",
+                    "Missing 'name' or 'version' field in package.json. These fields might be required for your application.",
+                ),
+            );
+        }
+
         const isExpo = await this.isExpoManagedApp(true);
         if (!isExpo) {
             if (!(await this.appHasExpoInstalled())) {
@@ -351,7 +364,7 @@ require('${entryPoint}');`;
      * Exponent sdk version that maps to the current react-native version
      * If react native version is not supported it returns null.
      */
-    private async exponentSdk(showProgress: boolean = false): Promise<string> {
+    public async exponentSdk(showProgress: boolean = false): Promise<string> {
         if (showProgress) {
             this.logger.logStream("...");
         }
@@ -480,6 +493,7 @@ require('${entryPoint}');`;
                     write: (chunk: any) => {
                         if (chunk.level <= 30) {
                             this.logger.logStream(chunk.msg);
+                            this.logger.logStream("\n");
                         } else if (chunk.level === 40) {
                             this.logger.warning(chunk.msg);
                         } else {
@@ -489,6 +503,40 @@ require('${entryPoint}');`;
                 },
                 type: "raw",
             });
+        }
+    }
+
+    public async getExpoEasProjectOwner(): Promise<string | null> {
+        const appJsonPath = this.pathToFileInWorkspace(APP_JSON);
+        try {
+            return JSON.parse(fs.readFileSync(appJsonPath, "utf-8")).expo.owner == undefined
+                ? null
+                : JSON.parse(fs.readFileSync(appJsonPath, "utf-8")).expo.owner;
+        } catch {
+            return null;
+        }
+    }
+
+    public async getExpoEasProjectId(): Promise<string | null> {
+        const appJsonPath = this.pathToFileInWorkspace(APP_JSON);
+        try {
+            return JSON.parse(fs.readFileSync(appJsonPath, "utf-8")).expo.extra.eas.projectId ==
+                undefined
+                ? null
+                : JSON.parse(fs.readFileSync(appJsonPath, "utf-8")).expo.extra.eas.projectId;
+        } catch {
+            return null;
+        }
+    }
+
+    public async getExpoEasProjectName(): Promise<string | null> {
+        const appJsonPath = this.pathToFileInWorkspace(APP_JSON);
+        try {
+            return JSON.parse(fs.readFileSync(appJsonPath, "utf-8")).expo.name == undefined
+                ? null
+                : JSON.parse(fs.readFileSync(appJsonPath, "utf-8")).expo.name;
+        } catch {
+            return null;
         }
     }
 }

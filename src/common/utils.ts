@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 import * as path from "path";
+import stripJsonComments = require("strip-json-comments");
+import { logger } from "@vscode/debugadapter";
 import { ChildProcess } from "./node/childProcess";
 import { HostPlatform } from "./hostPlatform";
 import customRequire from "./customRequire";
-import stripJsonComments = require("strip-json-comments");
-import { logger } from "vscode-debugadapter";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const JSON5 = require("json5");
@@ -82,4 +82,25 @@ export function stripJsonTrailingComma(str: string): any {
         objResult = JSON.parse(stripJsonComments(str));
     }
     return objResult;
+}
+
+export async function wait(time?: number): Promise<void> {
+    const times = time ? time : 2000;
+    await new Promise<void>(resolve => {
+        const timer = setTimeout(() => {
+            clearTimeout(timer);
+            resolve();
+        }, times);
+    });
+}
+
+export function getTimestamp(): string {
+    const date = new Date(Date.now());
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const time = `${date.getDate()}${String(date.getHours()).padStart(2, "0")}${String(
+        date.getMinutes(),
+    ).padStart(2, "0")}${String(date.getSeconds()).padStart(2, "0")}`;
+
+    return `${year}${month}${time}`;
 }

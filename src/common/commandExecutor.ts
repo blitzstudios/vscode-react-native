@@ -64,6 +64,18 @@ export class CommandExecutor {
         }
     }
 
+    public async executeToString(command: string, options: Options = {}): Promise<string> {
+        try {
+            const stdout = await this.childProcess.execToString(command, {
+                cwd: this.currentWorkingDirectory,
+                env: options.env,
+            });
+            return stdout;
+        } catch (reason) {
+            return reason;
+        }
+    }
+
     /**
      * Spawns a child process with the params passed
      * This method waits until the spawned process finishes execution
@@ -80,6 +92,13 @@ export class CommandExecutor {
      */
     public spawnReactPackager(command: string, args: string[], options: Options = {}): ISpawnResult {
         return this.spawnReactCommand(command, args, options);
+    }
+
+    /**
+     * Spawns the React Native packager in a child process.
+     */
+    public spawnExpoPackager(args: string[], options: Options = {}): ISpawnResult {
+        return this.spawnExpoCommand("start", args, options);
     }
 
     public async getReactNativeVersion(): Promise<string> {
@@ -118,6 +137,18 @@ export class CommandExecutor {
     ): ISpawnResult {
         const reactCommand = HostPlatform.getNpmCliCommand(this.selectReactNativeCLI());
         return this.spawnChildProcess(reactCommand, [command, ...args], options);
+    }
+
+    /**
+     * Executes a react native command and waits for its completion.
+     */
+    public spawnExpoCommand(
+        command: string,
+        args: string[] = [],
+        options: Options = {},
+    ): ISpawnResult {
+        const expoCommand = HostPlatform.getNpmCliCommand(this.selectExpoCLI());
+        return this.spawnChildProcess(expoCommand, [command, ...args], options);
     }
 
     /**
@@ -186,6 +217,13 @@ export class CommandExecutor {
         return (
             CommandExecutor.ReactNativeCommand ||
             path.resolve(this.nodeModulesRoot, "node_modules", ".bin", "react-native")
+        );
+    }
+
+    public selectExpoCLI(): string {
+        return (
+            CommandExecutor.ReactNativeCommand ||
+            path.resolve(this.nodeModulesRoot, "node_modules", ".bin", "expo")
         );
     }
 

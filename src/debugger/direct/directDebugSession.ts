@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 
 import * as vscode from "vscode";
-import { logger } from "vscode-debugadapter";
+import { logger } from "@vscode/debugadapter";
 import { DebugProtocol } from "vscode-debugprotocol";
 import * as nls from "vscode-nls";
 import { ProjectVersionHelper } from "../../common/projectVersionHelper";
@@ -23,6 +23,8 @@ import { PlatformType } from "../../extension/launchArgs";
 import { BaseCDPMessageHandler } from "../../cdp-proxy/CDPMessageHandlers/baseCDPMessageHandler";
 import { TipNotificationService } from "../../extension/services/tipsNotificationsService/tipsNotificationService";
 import { RNSession } from "../debugSessionWrapper";
+import { SettingsHelper } from "../../extension/settingsHelper";
+import { ReactNativeProjectHelper } from "../../common/reactNativeProjectHelper";
 import { IWDPHelper } from "./IWDPHelper";
 
 nls.config({
@@ -77,6 +79,9 @@ export class DirectDebugSession extends DebugSessionBase {
 
         try {
             try {
+                if (launchArgs.platform != "exponent") {
+                    await ReactNativeProjectHelper.verifyMetroConfigFile(launchArgs.cwd);
+                }
                 await this.initializeSettings(launchArgs);
                 logger.log("Launching the application");
                 logger.verbose(`Launching the application: ${JSON.stringify(launchArgs, null, 2)}`);
@@ -243,11 +248,13 @@ export class DirectDebugSession extends DebugSessionBase {
                         }
                     });
 
+                const settingsPorts = SettingsHelper.getPackagerPort(attachArgs.cwd);
                 const browserInspectUri = await this.debuggerEndpointHelper.retryGetWSEndpoint(
                     `http://localhost:${attachArgs.port}`,
                     90,
                     this.cancellationTokenSource.token,
                     attachArgs.useHermesEngine,
+                    settingsPorts,
                 );
                 this.appLauncher.getRnCdpProxy().setBrowserInspectUri(browserInspectUri);
                 await this.establishDebugSession(attachArgs);

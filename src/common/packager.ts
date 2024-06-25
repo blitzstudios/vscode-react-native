@@ -26,6 +26,7 @@ import { findFileInFolderHierarchy } from "./extensionHelper";
 import { FileSystem } from "./node/fileSystem";
 import { PromiseUtil } from "./node/promise";
 import { CONTEXT_VARIABLES_NAMES } from "./contextVariablesNames";
+import { getNodeVersion } from "./nodeHelper";
 
 nls.config({
     messageFormat: nls.MessageFormat.bundle,
@@ -57,6 +58,8 @@ export class Packager {
         old: "opn-main.js",
     };
     private static RN_VERSION_WITH_OPEN_PKG = "0.60.0";
+    private static NODE_AVAIABLE = "18.0.0";
+    private static RN_VERSION_WITH_PACKER_ISSUE = "0.73.0";
     private static JS_INJECTOR_DIRPATH =
         findFileInFolderHierarchy(__dirname, "js-patched") || __dirname;
     private static NODE_MODULES_FODLER_NAME = "node_modules";
@@ -108,6 +111,10 @@ export class Packager {
         return SettingsHelper.getReactNativePackagerCommandName(this.workspacePath);
     }
 
+    public resetToSettingsPort(): void {
+        this.packagerPort = SettingsHelper.getPackagerPort(this.workspacePath);
+    }
+
     public setRunOptions(runOptions: IRunOptions): void {
         this.runOptions = runOptions;
     }
@@ -119,6 +126,7 @@ export class Packager {
     public getStatusIndicator(): PackagerStatusIndicator {
         return this.packagerStatusIndicator;
     }
+
     public getHost(): string {
         return Packager.getHostForPort(this.getPort());
     }
@@ -129,6 +137,16 @@ export class Packager {
 
     public getProjectPath(): string {
         return this.projectPath;
+    }
+
+    private async stopWithlowNode() {
+        const versionInfo = await ProjectVersionHelper.getReactNativeVersions(this.projectPath);
+        const isNodeSupported = semver.gte(await getNodeVersion(), Packager.NODE_AVAIABLE);
+        const isRNWithPackerIssue = semver.gte(
+            versionInfo.reactNativeVersion,
+            Packager.RN_VERSION_WITH_PACKER_ISSUE,
+        );
+        return isRNWithPackerIssue && !isNodeSupported;
     }
 
     public async getPackagerArgs(
@@ -240,16 +258,38 @@ export class Packager {
 
             const packagerCommand = this.getReactNativePackagerCommandName();
 
-            const packagerSpawnResult = new CommandExecutor(
-                nodeModulesRoot,
-                this.projectPath,
-                this.logger,
-            ).spawnReactPackager(packagerCommand, args, spawnOptions);
+            let packagerSpawnResult;
+            if (this.runOptions?.platform != "exponent" && this.runOptions?.platform != "expoweb") {
+                packagerSpawnResult = new CommandExecutor(
+                  nodeModulesRoot,
+                  this.projectPath,
+                  this.logger,
+              ).spawnReactPackager(packagerCommand, args, spawnOptions);
+            } else if (this.runOptions?.platform == "exponent") {
+                packagerSpawnResult = new CommandExecutor(
+                    nodeModulesRoot,
+                    this.projectPath,
+                    this.logger,
+                ).spawnExpoPackager(args, spawnOptions);
+            } else {
+                packagerSpawnResult = new CommandExecutor(
+                    nodeModulesRoot,
+                    this.projectPath,
+                    this.logger,
+                ).spawnExpoPackager(["--web"]);
+            }
+
             this.packagerProcess = packagerSpawnResult.spawnedProcess;
 
             packagerSpawnResult.outcome.catch(() => {}); // We ignore all outcome errors
         }
 
+        if (await this.stopWithlowNode()) {
+            await this.stop();
+            throw new Error(
+                `React Native needs Node.js >= 18. You're currently on version ${await getNodeVersion()}. Please upgrade Node.js to a supported version and try again.`,
+            );
+        }
         await this.awaitStart();
         if (executedStartPackagerCmd) {
             this.logger.info(localize("PackagerStarted", "Packager started."));
@@ -454,6 +494,19 @@ export class Packager {
                 this.projectPath,
             );
 
+            const openModulePath = path.resolve(
+                nodeModulesRoot,
+                Packager.NODE_MODULES_FODLER_NAME,
+                OPN_PACKAGE_NAME,
+            );
+            this.logger.info(
+                localize(
+                    "VerifyOpenModuleMainFileAndEntry",
+                    "Need to check main file and entry point of open module, will setup and write new content if they're not existing. Path: {0}",
+                    openModulePath,
+                ),
+            );
+
             const flatDependencyPackagePath = path.resolve(
                 nodeModulesRoot,
                 Packager.NODE_MODULES_FODLER_NAME,
@@ -506,14 +559,35 @@ export class Packager {
             JS_INJECTOR_FILENAME,
         );
         if (packageJson.main !== JS_INJECTOR_FILENAME) {
+            this.logger.info(
+                localize(
+                    "NoOpenMainFile",
+                    "Cannot find main file in open module, executing setup...",
+                ),
+            );
+
             // Copy over the patched 'opn' main file
+            this.logger.info(localize("CopyOpenMainFile", "Copy open-main.js to open module..."));
             await new FileSystem().copyFile(
                 JS_INJECTOR_FILEPATH,
                 path.resolve(path.dirname(destnFilePath), JS_INJECTOR_FILENAME),
             );
+
             // Write/over-write the "main" attribute with the new file
+            this.logger.info(
+                localize(
+                    "AddOpenMainEntry",
+                    "Add open-main.js entry to package.json 'main' field...",
+                ),
+            );
             return opnPackage.setMainFile(JS_INJECTOR_FILENAME);
         }
+        this.logger.info(
+            localize(
+                "OpenMainEntryIsExisting",
+                "Find open-main.js and entry in open module, skip setup...",
+            ),
+        );
     }
 
     private setPackagerStopStateUI() {

@@ -12,6 +12,7 @@
   "description": "%reactNative.description%",
   "keywords": [
     "react-native",
+    "expo",
     "multi-root ready"
   ],
   "license": "%reactNative.license%",
@@ -48,27 +49,6 @@
   ],
   "main": "./src/extension/rn-extension",
   "contributes": {
-    "languages": [
-      {
-        "id": "ReactNativeToolsOutput",
-        "extensions": [
-          ".log"
-        ],
-        "mimetypes": [
-          "log",
-          "text/log",
-          "text/x-log",
-          "x-code-output"
-        ]
-      }
-    ],
-    "grammars": [
-      {
-        "language": "ReactNativeToolsOutput",
-        "scopeName": "react-native-tools-output",
-        "path": "./syntaxes/rn-output.tmGrammar.json"
-      }
-    ],
     "walkthroughs": [
       {
         "id": "RNTGetStarted",
@@ -153,6 +133,12 @@
         "enablement": "!config.security.workspace.trust.enabled || isWorkspaceTrusted"
       },
       {
+        "command": "reactNative.launchExpoWeb",
+        "title": "%reactNative.command.launchExpoWeb.title%",
+        "category": "React Native",
+        "enablement": "!config.security.workspace.trust.enabled || isWorkspaceTrusted"
+      },
+      {
         "command": "reactNative.runAndroidSimulator",
         "title": "%reactNative.command.runAndroidSimulator.title%",
         "category": "React Native",
@@ -217,6 +203,34 @@
         "title": "%reactNative.command.publishToExpHost.title%",
         "category": "React Native",
         "enablement": "!config.security.workspace.trust.enabled || isWorkspaceTrusted"
+      },
+      {
+        "command": "reactNative.createExpoEASBuildConfigFile",
+        "title": "%reactNative.command.createExpoEASBuildConfigFile.title%",
+        "category": "React Native",
+        "enablement": "!config.security.workspace.trust.enabled || isWorkspaceTrusted"
+      },
+      {
+        "command": "reactNative.openEASProjectInWebPage",
+        "title": "%reactNative.command.openEASProjectInWebPage.title%",
+        "category": "React Native",
+        "enablement": "!config.security.workspace.trust.enabled || isWorkspaceTrusted"
+      },
+      {
+        "command": "reactNative.revertOpenModule",
+        "title": "%reactNative.command.revertOpenModule.title%",
+        "category": "React Native",
+        "enablement": "!config.security.workspace.trust.enabled || isWorkspaceTrusted"
+      },
+      {
+        "command": "reactNative.openRNUpgradeHelper",
+        "title": "%reactNative.command.openRNUpgradeHelper.title%",
+        "category": "React Native"
+      },
+      {
+        "command": "reactNative.installExpoGoApplication",
+        "title": "%reactNative.command.installExpoGoApplication.title%",
+        "category": "React Native"
       },
       {
         "command": "reactNative.showDevMenu",
@@ -326,6 +340,20 @@
         "icon": "$(debug-alt)"
       },
       {
+        "command": "reactNative.debugScenario.debugInHermesExponentExperimental",
+        "title": "Debug in Hermes Exponent",
+        "category": "React Native",
+        "enablement": "!config.security.workspace.trust.enabled && !inDebugMode || isWorkspaceTrusted && !inDebugMode",
+        "icon": "$(debug-alt)"
+      },
+      {
+        "command": "reactNative.debugScenario.debugInExponentWebExperimental",
+        "title": "Debug in Exponent Web - Experimental",
+        "category": "React Native",
+        "enablement": "!config.security.workspace.trust.enabled && !inDebugMode || isWorkspaceTrusted && !inDebugMode",
+        "icon": "$(debug-alt)"
+      },
+      {
         "command": "reactNative.debugScenario.debugAndroidHermesExperimental",
         "title": "Debug Android Hermes - Experimental",
         "category": "React Native",
@@ -394,6 +422,36 @@
         "category": "React Native",
         "enablement": "!config.security.workspace.trust.enabled && !inDebugMode || isWorkspaceTrusted && !inDebugMode",
         "icon": "$(play)"
+      },
+      {
+        "command": "reactNative.doctor",
+        "title": "Run Doctor",
+        "category": "React Native",
+        "enablement": "!config.security.workspace.trust.enabled || isWorkspaceTrusted"
+      },
+      {
+        "command": "reactNative.ExpoDoctor",
+        "title": "Expo Run Doctor",
+        "category": "React Native",
+        "enablement": "!config.security.workspace.trust.enabled || isWorkspaceTrusted"
+      },
+      {
+        "command": "reactNative.expoPrebuild",
+        "title": "Expo Prebuild",
+        "category": "React Native",
+        "enablement": "!config.security.workspace.trust.enabled || isWorkspaceTrusted"
+      },
+      {
+        "command": "reactNative.expoPrebuildClean",
+        "title": "Expo Prebuild Clean",
+        "category": "React Native",
+        "enablement": "!config.security.workspace.trust.enabled || isWorkspaceTrusted"
+      },
+      {
+        "command": "reactNative.reopenQRCode",
+        "title": "Reopen QR Code in Expo",
+        "category": "React Native",
+        "enablement": "!config.security.workspace.trust.enabled || isWorkspaceTrusted"
       }
     ],
     "menus": {
@@ -428,6 +486,14 @@
         },
         {
           "command": "reactNative.debugScenario.debugInExponent",
+          "when": "isRNProject && config.react-native-tools.displayDebuggingCommandsButton"
+        },
+        {
+          "command": "reactNative.debugScenario.debugInHermesExponentExperimental",
+          "when": "isRNProject && config.react-native-tools.displayDebuggingCommandsButton"
+        },
+        {
+          "command": "reactNative.debugScenario.debugInExponentWebExperimental",
           "when": "isRNProject && config.react-native-tools.displayDebuggingCommandsButton"
         },
         {
@@ -506,6 +572,14 @@
         },
         {
           "command": "reactNative.debugScenario.debugInExponent",
+          "when": "false"
+        },
+        {
+          "command": "reactNative.debugScenario.debugInHermesExponentExperimental",
+          "when": "false"
+        },
+        {
+          "command": "reactNative.debugScenario.debugInExponentWebExperimental",
           "when": "false"
         },
         {
@@ -672,7 +746,8 @@
                   "android",
                   "exponent",
                   "windows",
-                  "macos"
+                  "macos",
+                  "expoweb"
                 ],
                 "description": "%reactNative.launch.platform.description%"
               },
@@ -793,6 +868,18 @@
                 "default": "lan",
                 "description": "%reactNative.launch.expoHostType.description%"
               },
+              "jsDebugTrace": {
+                "type": "boolean",
+                "description": "%reactNative.direct.attach.jsDebugTrace.description%"
+              },
+              "browserTarget": {
+                "type": "string",
+                "description": "%reactNative.direct.attach.browserTarget.description%"
+              },
+              "url": {
+                "type": "string",
+                "description": "%reactNative.direct.attach.url.description%"
+              },
               "enableDebug": {
                 "type": "boolean",
                 "description": "%reactNative.launch.enableDebug.description%",
@@ -849,6 +936,14 @@
               "sourceMapPathOverrides": {
                 "type": "object",
                 "description": "%reactNative.attach.sourceMapsPathOverrides.description%"
+              },
+              "jsDebugTrace": {
+                "type": "boolean",
+                "description": "%reactNative.direct.attach.jsDebugTrace.description%"
+              },
+              "browserTarget": {
+                "type": "string",
+                "description": "%reactNative.direct.attach.browserTarget.description%"
               },
               "sourceMapRenames": {
                 "type": "boolean",
@@ -919,14 +1014,34 @@
                   "android",
                   "ios",
                   "macos",
-                  "windows"
+                  "windows",
+                  "exponent",
+                  "expoweb"
                 ],
                 "description": "%reactNative.launch.direct.platform.description%"
+              },
+              "expoHostType": {
+                "type": "string",
+                "enum": [
+                  "tunnel",
+                  "lan",
+                  "local"
+                ],
+                "default": "lan",
+                "description": "%reactNative.launch.expoHostType.description%"
               },
               "useHermesEngine": {
                 "type": "boolean",
                 "description": "%reactNative.direct.attach.useHermesEngine.description%",
                 "default": true
+              },
+              "jsDebugTrace": {
+                "type": "boolean",
+                "description": "%reactNative.direct.attach.jsDebugTrace.description%"
+              },
+              "browserTarget": {
+                "type": "string",
+                "description": "%reactNative.direct.attach.browserTarget.description%"
               },
               "cwd": {
                 "type": "string",
@@ -1037,6 +1152,10 @@
                 "type": "boolean",
                 "description": "%reactNative.launch.enableDebug.description%",
                 "default": true
+              },
+              "url": {
+                "type": "string",
+                "description": "%reactNative.direct.attach.url.description%"
               }
             }
           }
@@ -1158,6 +1277,12 @@
           "default": "Full",
           "scope": "resource"
         },
+        "react-native.workspace.exclude": {
+          "type": "array",
+          "description": "%reactNative.workspace.exclude.description%",
+          "scope": "resource",
+          "default": []
+        },
         "react-native-tools.reactNativeGlobalCommandName": {
           "description": "%reactNative.configuration.properties.react-native-tools.reactNativeGlobalCommandName.description%",
           "type": "string",
@@ -1222,6 +1347,18 @@
           "type": "boolean",
           "scope": "resource",
           "default": true
+        },
+        "telemetry.optIn":  {
+          "description": "Whether to send usage data to Microsoft",
+          "type": "boolean",
+          "scope": "resource",
+          "default": ""
+        },
+        "react-native-tools.showPackagerIndicator": {
+          "description": "Whether to show the packager indicator in the status bar.",
+          "type": "boolean",
+          "scope": "resource",
+          "default": true
         }
       }
     }
@@ -1265,14 +1402,15 @@
     ]
   },
   "dependencies": {
+    "@vscode/debugadapter": "^1.63.0",
     "command-exists": "1.2.9",
     "configstore": "5.0.1",
     "extract-opts": "2.2.0",
     "flatten-source-map": "0.0.2",
     "glob": "7.1.6",
-    "ip": "1.1.5",
+    "ip": "1.1.9",
     "js-base64": "3.6.0",
-    "json5": "^1.0.1",
+    "json5": "^1.0.2",
     "jsonc-parser": "3.0.0",
     "mkdirp": "1.0.3",
     "openssl-wrapper": "0.3.4",
@@ -1282,17 +1420,17 @@
     "querystring": "0.2.1",
     "rsocket-core": "0.0.23",
     "rsocket-tcp-server": "0.0.23",
-    "semver": "6.3.0",
+    "semver": "6.3.1",
     "source-map": "0.5.2",
     "source-map-resolve": "0.5.3",
     "strip-json-comments": "2.0.1",
     "tmp-promise": "3.0.2",
-    "uuid": "8.3.2",
+    "uuid": "9.0.0",
     "vscode-cdp-proxy": "0.2.0",
-    "vscode-debugadapter": "1.39.1",
-    "vscode-extension-telemetry": "0.0.5",
+    "vscode-extension-telemetry": "0.4.5",
+    "vscode-js-debug-browsers": "^1.0.5",
     "vscode-nls": "4.1.2",
-    "ws": "7.4.6"
+    "ws": "7.5.10"
   },
   "devDependencies": {
     "@mixer/parallel-prettier": "^2.0.1",
@@ -1314,12 +1452,14 @@
     "@types/shelljs": "0.7.0",
     "@types/source-map": "0.5.2",
     "@types/source-map-support": "0.2.28",
-    "@types/uuid": "8.3.0",
+    "@types/uuid": "9.0.0",
     "@types/vscode": "^1.46.0",
     "@types/websocket": "0.0.33",
     "@types/ws": "0.0.39",
-    "@typescript-eslint/eslint-plugin": "4.15.0",
-    "@typescript-eslint/parser": "4.15.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "@vscode/test-electron": "^2.3.8",
+    "@vscode/vsce": "^2.19.0",
     "ansi-colors": "3.2.4",
     "copy-webpack-plugin": "6.0.2",
     "del": "2.2.0",
@@ -1358,12 +1498,10 @@
     "source-map-support": "0.4.0",
     "through2": "2.0.1",
     "ts-loader": "9.0.2",
-    "typescript": "3.9.7",
-    "vsce": "^2.6.6",
-    "vscode-debugprotocol": "1.40.0",
-    "vscode-nls-dev": "^4.0.0",
-    "vscode-test": "^1.6.1",
-    "webpack": "5.28.0",
+    "typescript": "5.0.4",
+    "vscode-debugprotocol": "1.51.0",
+    "vscode-nls-dev": "^4.0.4",
+    "webpack": "5.76.0",
     "webpack-bundle-analyzer": "4.4.0"
   },
   "extensionDependencies": [

@@ -21,7 +21,17 @@ export enum InternalErrorCode {
     DebuggingCommandFailed = 116,
     FailedToTestDevEnvironment = 117,
     CommandCanceled = 118,
-
+    FailedToConfigEASBuild = 119,
+    FailedToOpenProjectPage = 120,
+    FailedToRevertOpenModule = 121,
+    FailedToOpenRNUpgradeHelper = 122,
+    FailedToInstallExpoGo = 123,
+    FailedToLaunchExpoWeb = 124,
+    FailedToRunRNDoctor = 125,
+    FailedToRunExpoDoctor = 126,
+    FailedToRunPrebuild = 127,
+    FailedToRunPrebuildClean = 128,
+    FailedToReopenQRCode = 129,
     // Device Deployer errors
     IOSDeployNotFound = 201,
 
