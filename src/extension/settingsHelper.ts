@@ -98,23 +98,6 @@ export class SettingsHelper {
     }
 
     /**
-     * Get the React Native Packager Command Name, e.g. 'start', 'webpack-start', or a custom one
-     */
-    public static getReactNativePackagerCommandName(fsPath: string): string {
-        const projectRoot = SettingsHelper.getReactNativeProjectRoot(fsPath);
-        const uri = vscode.Uri.file(projectRoot);
-
-        const workspaceConfiguration = vscode.workspace.getConfiguration("react-native-tools", uri);
-        if (workspaceConfiguration.has("reactNativePackagerCommandName")) {
-            return ConfigurationReader.readString(
-                workspaceConfiguration.get("reactNativePackagerCommandName")
-            );
-        }
-
-        return "start";
-    }
-
-    /**
      * Get command line run arguments from settings.json
      */
     public static getRunArgs(

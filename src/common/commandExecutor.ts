@@ -90,8 +90,8 @@ export class CommandExecutor {
     /**
      * Spawns the React Native packager in a child process.
      */
-    public spawnReactPackager(command: string, args: string[], options: Options = {}): ISpawnResult {
-        return this.spawnReactCommand(command, args, options);
+    public spawnReactPackager(args: string[], options: Options = {}): ISpawnResult {
+        return this.spawnReactCommand("start", args, options);
     }
 
     /**

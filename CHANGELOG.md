@@ -1,3 +1,7 @@
+## 5.0.0 (Sleeper)
+* Merging in core changes from  1.10.1 -> 1.13.0
+* Removing packager name customization - handled automatically by repack 4.
+
 ## 4.0.0 (Sleeper)
 * Fixing reload command from react native dev settings.
 
@@ -9,7 +13,7 @@
 * Adding in support for overriding the react native packager start command.
 * Enable debugging with module federation.
 * Allow connections to multiple iOS simulators at once.
-  
+
 ## 1.13.0
 * Support react-native and expo doctor in command palette [#2116](https://github.com/microsoft/vscode-react-native/pull/2116)
 * Skip extra commas for getting workspace settings [#2113](https://github.com/microsoft/vscode-react-native/pull/2113)

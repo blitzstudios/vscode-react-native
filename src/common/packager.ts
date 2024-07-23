@@ -107,10 +107,6 @@ export class Packager {
         return this.packagerPort || SettingsHelper.getPackagerPort(this.workspacePath);
     }
 
-    public getReactNativePackagerCommandName(): string {
-        return SettingsHelper.getReactNativePackagerCommandName(this.workspacePath);
-    }
-
     public resetToSettingsPort(): void {
         this.packagerPort = SettingsHelper.getPackagerPort(this.workspacePath);
     }
@@ -256,15 +252,13 @@ export class Packager {
                 this.projectPath,
             );
 
-            const packagerCommand = this.getReactNativePackagerCommandName();
-
             let packagerSpawnResult;
             if (this.runOptions?.platform != "exponent" && this.runOptions?.platform != "expoweb") {
                 packagerSpawnResult = new CommandExecutor(
-                  nodeModulesRoot,
-                  this.projectPath,
-                  this.logger,
-              ).spawnReactPackager(packagerCommand, args, spawnOptions);
+                    nodeModulesRoot,
+                    this.projectPath,
+                    this.logger,
+                ).spawnReactPackager(args, spawnOptions);
             } else if (this.runOptions?.platform == "exponent") {
                 packagerSpawnResult = new CommandExecutor(
                     nodeModulesRoot,

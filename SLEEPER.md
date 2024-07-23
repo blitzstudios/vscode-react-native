@@ -1,1 +1,4 @@
-yarn gulp release to build!
+to build a .vsix:
+
+npm ci
+npm run release

@@ -1,7 +1,7 @@
 {
   "name": "vscode-react-native",
   "displayName": "React Native Tools (Sleeper)",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "private": true,
   "publisher": "sleeper",
   "icon": "resources/images/icon.png",
@@ -1288,11 +1288,6 @@
           "type": "string",
           "scope": "resource"
         },
-        "react-native-tools.reactNativePackagerCommandName": {
-          "description": "%reactNative.configuration.properties.react-native-tools.reactNativePackagerCommandName.description%",
-          "type": "string",
-          "scope": "resource"
-        },
         "react-native-tools.projectRoot": {
           "description": "%reactNative.configuration.properties.react-native-tools.projectRoot.description%",
           "type": "string",
@@ -1375,6 +1370,7 @@
   },
   "scripts": {
     "build": "gulp build",
+    "release": "gulp release",
     "vscode:prepublish": "gulp",
     "test": "node ./test/runTest.js",
     "test-localization": "node ./test/localization/runTest.js",
