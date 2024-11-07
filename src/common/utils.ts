@@ -1,9 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 import * as path from "path";
+import * as net from "net";
+import * as fs from "fs";
 import stripJsonComments = require("strip-json-comments");
 import { logger } from "@vscode/debugadapter";
+import { Address4, Address6 } from "ip-address";
 import { ChildProcess } from "./node/childProcess";
+import { FileSystem } from "./node/fileSystem";
 import { HostPlatform } from "./hostPlatform";
 import customRequire from "./customRequire";
 
@@ -103,4 +107,58 @@ export function getTimestamp(): string {
     ).padStart(2, "0")}${String(date.getSeconds()).padStart(2, "0")}`;
 
     return `${year}${month}${time}`;
+}
+
+export function getTSVersion(projectPath: string): Promise<string> {
+    const childProcess = new ChildProcess();
+    return childProcess.execToString("npx tsc -v", { cwd: projectPath });
+}
+
+export function ipToBuffer(ip: string): Buffer {
+    if (net.isIPv4(ip)) {
+        // Handle IPv4 addresses
+        const address = new Address4(ip);
+        return Buffer.from(address.toArray());
+    } else if (net.isIPv6(ip)) {
+        // Handle IPv6 addresses
+        const address = new Address6(ip);
+        return Buffer.from(address.toByteArray());
+    }
+    throw new Error("Invalid IP address format.");
+}
+
+export async function switchBundleOptions(projectRootPath: string, flag: boolean) {
+    const splitBundleOptionsPath = path.resolve(
+        projectRootPath,
+        "node_modules",
+        "metro",
+        "src",
+        "lib",
+        "splitBundleOptions.js",
+    );
+    const splitBundleOptionsContent = fs.readFileSync(splitBundleOptionsPath, "utf-8");
+    let modifiedData;
+    if (flag) {
+        modifiedData = splitBundleOptionsContent.replace(
+            /excludeSource:\s*options\.excludeSource/,
+            "excludeSource: false",
+        );
+
+        modifiedData = modifiedData.replace(
+            /sourcePaths:\s*options\.sourcePaths/,
+            'sourcePaths: "absolute"',
+        );
+    } else {
+        modifiedData = splitBundleOptionsContent.replace(
+            /excludeSource:\s*false/,
+            "excludeSource: options.excludeSource",
+        );
+
+        modifiedData = modifiedData.replace(
+            /sourcePaths:\s*"absolute"/,
+            "sourcePaths: options.sourcePaths",
+        );
+    }
+    const nodeFileSystem = new FileSystem();
+    await nodeFileSystem.writeFile(splitBundleOptionsPath, modifiedData);
 }

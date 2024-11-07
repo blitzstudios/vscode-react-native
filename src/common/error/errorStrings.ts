@@ -419,4 +419,7 @@ export const ERROR_STRINGS = {
         "FailedToReopenQRCode",
         "Failed to reopen QR code",
     ),
+    [InternalErrorCode.FailedToEnableHermes]: "Failed to make changes to Hermes",
+    [InternalErrorCode.FailedToEnableExpoHermes]: "Failed to make changes to Expo Hermes",
+    [InternalErrorCode.FailedToOpenExpoUpgradeHelper]: "Failed to open expo upgrade helper",
 };

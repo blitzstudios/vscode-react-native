@@ -452,6 +452,24 @@
         "title": "Reopen QR Code in Expo",
         "category": "React Native",
         "enablement": "!config.security.workspace.trust.enabled || isWorkspaceTrusted"
+      },
+      {
+        "command": "reactNative.hermesEnable",
+        "title": "Enable Hermes",
+        "category": "React Native",
+        "enablement": "!config.security.workspace.trust.enabled || isWorkspaceTrusted"
+      },
+      {
+        "command": "reactNative.expoHermesEnable",
+        "title": "Enable & Disable Expo Hermes",
+        "category": "React Native",
+        "enablement": "!config.security.workspace.trust.enabled || isWorkspaceTrusted"
+      },
+      {
+        "command": "reactNative.openExpoUpgradeHelper",
+        "title": "Open expo upgrade helper in web page",
+        "category": "React Native",
+        "enablement": "!config.security.workspace.trust.enabled || isWorkspaceTrusted"
       }
     ],
     "menus": {
@@ -1343,7 +1361,7 @@
           "scope": "resource",
           "default": true
         },
-        "telemetry.optIn":  {
+        "react-native-tools.telemetry.optIn":  {
           "description": "Whether to send usage data to Microsoft",
           "type": "boolean",
           "scope": "resource",
@@ -1354,6 +1372,12 @@
           "type": "boolean",
           "scope": "resource",
           "default": true
+        },
+        "react-native-tools.setNodeVersion": {
+          "description": "The version of Node.js to use for running React Native.",
+          "type": "string",
+          "scope": "resource",
+          "default": ""
         }
       }
     }
@@ -1404,11 +1428,12 @@
     "extract-opts": "2.2.0",
     "flatten-source-map": "0.0.2",
     "glob": "7.1.6",
-    "ip": "1.1.9",
+    "ip-address": "^9.0.5",
     "js-base64": "3.6.0",
     "json5": "^1.0.2",
     "jsonc-parser": "3.0.0",
     "mkdirp": "1.0.3",
+    "net": "^1.0.2",
     "openssl-wrapper": "0.3.4",
     "pako": "2.0.3",
     "qr-image": "3.2.0",
@@ -1471,7 +1496,7 @@
     "eslint-plugin-unicorn": "^28.0.2",
     "event-stream": "3.3.4",
     "fancy-log": "1.3.3",
-    "gulp": "4.0.2",
+    "gulp": "5.0.0",
     "gulp-filter": "6.0.0",
     "gulp-mocha": "^8.0.0",
     "gulp-preprocess": "3.0.3",
@@ -1497,7 +1522,7 @@
     "typescript": "5.0.4",
     "vscode-debugprotocol": "1.51.0",
     "vscode-nls-dev": "^4.0.4",
-    "webpack": "5.76.0",
+    "webpack": "5.94.0",
     "webpack-bundle-analyzer": "4.4.0"
   },
   "extensionDependencies": [

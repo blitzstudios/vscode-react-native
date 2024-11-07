@@ -175,6 +175,7 @@ export class DirectDebugSession extends DebugSessionBase {
                 this.projectRootPath,
                 ProjectVersionHelper.generateAdditionalPackagesToCheckByPlatform(attachArgs),
             );
+
             extProps = TelemetryHelper.addPlatformPropertiesToTelemetryProperties(
                 attachArgs,
                 versions,
@@ -287,7 +288,7 @@ export class DirectDebugSession extends DebugSessionBase {
     }
 
     protected async establishDebugSession(attachArgs: IAttachRequestArgs): Promise<void> {
-        const attachConfiguration = JsDebugConfigAdapter.createDebuggingConfigForRNHermes(
+        const attachConfiguration = await JsDebugConfigAdapter.createDebuggingConfigForRNHermes(
             attachArgs,
             this.appLauncher.getCdpProxyPort(),
             this.rnSession.sessionId,

@@ -27,6 +27,7 @@ import { FileSystem } from "./node/fileSystem";
 import { PromiseUtil } from "./node/promise";
 import { CONTEXT_VARIABLES_NAMES } from "./contextVariablesNames";
 import { getNodeVersion } from "./nodeHelper";
+import { getTSVersion } from "./utils";
 
 nls.config({
     messageFormat: nls.MessageFormat.bundle,
@@ -60,6 +61,7 @@ export class Packager {
     private static RN_VERSION_WITH_OPEN_PKG = "0.60.0";
     private static NODE_AVAIABLE = "18.0.0";
     private static RN_VERSION_WITH_PACKER_ISSUE = "0.73.0";
+    private static TS_VERSION_SUPPORTED = "0.70.0";
     private static JS_INJECTOR_DIRPATH =
         findFileInFolderHierarchy(__dirname, "js-patched") || __dirname;
     private static NODE_MODULES_FODLER_NAME = "node_modules";
@@ -72,6 +74,7 @@ export class Packager {
     private static fs: FileSystem = new FileSystem();
     private expoHelper: ExponentHelper;
     private runOptions?: IRunOptions;
+    private nodeVersion: string;
 
     constructor(
         private workspacePath: string,
@@ -135,14 +138,33 @@ export class Packager {
         return this.projectPath;
     }
 
-    private async stopWithlowNode() {
+    private async stopWithlowNode(env: object) {
         const versionInfo = await ProjectVersionHelper.getReactNativeVersions(this.projectPath);
-        const isNodeSupported = semver.gte(await getNodeVersion(), Packager.NODE_AVAIABLE);
-        const isRNWithPackerIssue = semver.gte(
-            versionInfo.reactNativeVersion,
-            Packager.RN_VERSION_WITH_PACKER_ISSUE,
-        );
-        return isRNWithPackerIssue && !isNodeSupported;
+        this.nodeVersion = await getNodeVersion(this.projectPath, env);
+        if (this.nodeVersion) {
+            const isNodeSupported = semver.gte(this.nodeVersion, Packager.NODE_AVAIABLE);
+            const isRNWithPackerIssue = semver.gte(
+                versionInfo.reactNativeVersion,
+                Packager.RN_VERSION_WITH_PACKER_ISSUE,
+            );
+            return isRNWithPackerIssue && !isNodeSupported;
+        }
+        return false;
+    }
+
+    private async verifiyTSVersion() {
+        try {
+            const tsVersion = await getTSVersion(this.projectPath);
+            if (semver.lt(tsVersion.replace("Version", ""), Packager.TS_VERSION_SUPPORTED)) {
+                this.logger.warning(
+                    `React Native needs TypeScript >=${Packager.TS_VERSION_SUPPORTED}. You're currently on ${tsVersion}. Please upgrade TypeScript to a supported version and try again.`,
+                );
+            }
+        } catch (err) {
+            this.logger.warning(
+                `Couldn't verify TypeScript version. Please make sure you have TypeScript >=${Packager.TS_VERSION_SUPPORTED} installed.`,
+            );
+        }
     }
 
     public async getPackagerArgs(
@@ -194,7 +216,7 @@ export class Packager {
         this.packagerStatusIndicator.updatePackagerStatus(PackagerStatus.PACKAGER_STARTING);
         let executedStartPackagerCmd = false;
         let rnVersion: string;
-
+        let reactEnv = {};
         if (!(await this.isRunning())) {
             if (this.packagerProcess) {
                 this.logger.warning(
@@ -235,7 +257,7 @@ export class Packager {
                 env = GeneralPlatform.getEnvArgument(env, null, rootEnv);
             }
 
-            const reactEnv = Object.assign({}, env, {
+            reactEnv = Object.assign({}, env, {
                 REACT_DEBUGGER: "echo A debugger is not needed: ",
                 REACT_EDITOR: !failedRNVersions.includes(rnVersion)
                     ? "code"
@@ -278,12 +300,13 @@ export class Packager {
             packagerSpawnResult.outcome.catch(() => {}); // We ignore all outcome errors
         }
 
-        if (await this.stopWithlowNode()) {
+        if (await this.stopWithlowNode(reactEnv)) {
             await this.stop();
             throw new Error(
-                `React Native needs Node.js >= 18. You're currently on version ${await getNodeVersion()}. Please upgrade Node.js to a supported version and try again.`,
+                `React Native needs Node.js >= 18. You're currently on version ${this.nodeVersion}. Please upgrade Node.js to a supported version and try again.`,
             );
         }
+        await this.verifiyTSVersion();
         await this.awaitStart();
         if (executedStartPackagerCmd) {
             this.logger.info(localize("PackagerStarted", "Packager started."));
@@ -294,7 +317,12 @@ export class Packager {
                 true,
             );
         } else {
-            this.logger.info(localize("PackagerIsAlreadyRunning", "Packager is already running."));
+            this.logger.info(
+                localize(
+                    "PackagerIsAlreadyRunning",
+                    "Packager is already running in this port, you can either stop the packager or use a different port for this project.",
+                ),
+            );
             if (!this.packagerProcess) {
                 this.logger.warning(
                     ErrorHelper.getWarning(
@@ -326,6 +354,9 @@ export class Packager {
                                 "Packager is still running. If the packager was started outside VS Code, please quit the packager process using the task manager.",
                             ),
                         ),
+                    );
+                    this.logger.info(
+                        "Packager is already running in this port, you can either stop the packager or use a different port for this project.",
                     );
                 }
             } else {

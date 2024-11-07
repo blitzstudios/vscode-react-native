@@ -7,9 +7,9 @@ import stripJsonComments = require("strip-json-comments");
 import { ConfigurationReader } from "../common/configurationReader";
 import { Packager } from "../common/packager";
 import { SystemColorTheme } from "../common/editorColorThemesHelper";
+import { stripJsonTrailingComma } from "../common/utils";
 import { LogLevel } from "./log/LogHelper";
 import { PackagerStatusIndicator } from "./packagerStatusIndicator";
-import { stripJsonTrailingComma } from "../../src/common/utils";
 
 export class SettingsHelper {
     /**
@@ -249,7 +249,10 @@ export class SettingsHelper {
     }
 
     public static getWorkspaceTelemetry() {
-        const workspaceConfiguration = vscode.workspace.getConfiguration("telemetry", null);
+        const workspaceConfiguration = vscode.workspace.getConfiguration(
+            "react-native-tools.telemetry",
+            null,
+        );
         if (workspaceConfiguration.has("optIn")) {
             return workspaceConfiguration.get("optIn");
         }
@@ -267,5 +270,16 @@ export class SettingsHelper {
             );
         }
         return true;
+    }
+
+    public static getSettingNodeVersion(): string {
+        const workspaceConfiguration = vscode.workspace.getConfiguration(
+            "react-native-tools",
+            null,
+        );
+        if (workspaceConfiguration.has("setNodeVersion")) {
+            return ConfigurationReader.readString(workspaceConfiguration.get("setNodeVersion"));
+        }
+        return "";
     }
 }
