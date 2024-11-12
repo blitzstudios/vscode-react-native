@@ -37,6 +37,7 @@ export class JsDebugConfigAdapter {
         if (semver.gte(versions.reactNativeVersion, JsDebugConfigAdapter.RNVersion_Direct_Debug)) {
             extraArgs.sourceMapPathOverrides = {
                 "/[metro-project]/*": `${attachArgs.cwd}/*`,
+                "webpack:/sleeper/*": `${attachArgs.cwd}/*`,
             };
         }
 
