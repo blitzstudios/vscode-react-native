@@ -77,6 +77,9 @@ export class SimulatorPlist {
 
             // Look through $SIMULATOR_HOME/Containers/Data/Application/*/Library/Preferences to find $BUNDLEID.plist
             const apps = await this.nodeFileSystem.readDir(pathBefore);
+            this.logger.warning(
+                `Looking for plist in ${pathBefore} and ${pathAfter} (${apps.length} apps)`,
+            );
 
             plistCandidates = plistCandidates.concat(
                 apps

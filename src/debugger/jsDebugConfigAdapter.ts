@@ -2,7 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 import * as semver from "semver";
 import { ProjectVersionHelper } from "../common/projectVersionHelper";
+import { OutputChannelLogger } from "../extension/log/OutputChannelLogger";
 import { IAttachRequestArgs } from "./debugSessionBase";
+
+const outputChannelLogger = OutputChannelLogger.getMainChannel();
 
 export class JsDebugConfigAdapter {
     private static RNVersion_Direct_Debug = "0.76.0";
@@ -33,12 +36,20 @@ export class JsDebugConfigAdapter {
     ) {
         const extraArgs: any = {};
         const versions = await ProjectVersionHelper.getReactNativeVersions(attachArgs.cwd);
+        outputChannelLogger.info(
+            `Luke - versions.reactNativeVersion: ${versions.reactNativeVersion}`,
+        );
         // Handle project file path from 0.76
         if (semver.gte(versions.reactNativeVersion, JsDebugConfigAdapter.RNVersion_Direct_Debug)) {
             extraArgs.sourceMapPathOverrides = {
                 "/[metro-project]/*": `${attachArgs.cwd}/*`,
-                "webpack:/sleeper/*": `${attachArgs.cwd}/*`,
+                "webpack://sleeper/*": `${attachArgs.cwd}/*`,
             };
+            outputChannelLogger.info(
+                `Custom sourceMapPathOverrides applied: ${JSON.stringify(
+                    extraArgs.sourceMapPathOverrides,
+                )}`,
+            );
         }
 
         return Object.assign({}, JsDebugConfigAdapter.getExistingExtraArgs(attachArgs), extraArgs, {

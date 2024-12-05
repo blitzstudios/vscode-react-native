@@ -1526,6 +1526,6 @@
     "webpack-bundle-analyzer": "4.4.0"
   },
   "extensionDependencies": [
-    "ms-vscode.js-debug-nightly"
+    "ms-vscode.js-debug"
   ]
 }

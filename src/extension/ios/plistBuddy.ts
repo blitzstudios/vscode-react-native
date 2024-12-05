@@ -247,7 +247,6 @@ export class PlistBuddy {
          * @flow
          * @format
          */
-
         const iOSCliPlatform = semver.gte(rnVersion, PlistBuddy.RN_VERSION_CLI_PLATFORM_APPLE)
             ? semver.gte(rnVersion, PlistBuddy.RN_VERSION_CLI_CONFIG_APPLE)
                 ? "cli-config-apple"
@@ -258,17 +257,34 @@ export class PlistBuddy {
             ProjectVersionHelper.isCanaryVersion(rnVersion)
                 ? iOSCliPlatform
                 : "cli";
-        const findXcodeProjectLocation = `node_modules/@react-native-community/${iOSCliFolderName}/build/${
+        const findXcodeProjectLocation = `${
             semver.gte(rnVersion, PlistBuddy.RN69_FUND_XCODE_PROJECT_LOCATION_VERSION)
                 ? "config/findXcodeProject"
                 : "commands/runIOS/findXcodeProject"
         }`;
-        const findXcodeProject = customRequire(
-            path.join(
-                AppLauncher.getNodeModulesRootByProjectPath(projectRoot),
-                findXcodeProjectLocation,
-            ),
-        ).default;
+        let findXcodeProject;
+        const possiblePaths = [
+            `../node_modules/@react-native-community/${iOSCliFolderName}/build/${findXcodeProjectLocation}`,
+            `node_modules/@react-native-community/${iOSCliFolderName}/build/${findXcodeProjectLocation}`,
+        ];
+        for (const relativePath of possiblePaths) {
+            try {
+                findXcodeProject = customRequire(
+                    path.join(
+                        AppLauncher.getNodeModulesRootByProjectPath(projectRoot),
+                        relativePath,
+                    ),
+                ).default;
+                break; // Exit the loop if the module is successfully loaded
+            } catch (err) {
+                if (err.code !== "MODULE_NOT_FOUND") {
+                    throw err; // Re-throw if the error is not related to module resolution
+                }
+            }
+        }
+        if (!findXcodeProject) {
+            throw new Error(`Could not locate findXcodeProject in any known paths.`);
+        }
         const xcodeProject = findXcodeProject(fs.readdirSync(platformProjectRoot));
         if (!xcodeProject) {
             throw new Error(

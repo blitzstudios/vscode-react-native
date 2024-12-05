@@ -519,19 +519,6 @@ export class Packager {
                 this.projectPath,
             );
 
-            const openModulePath = path.resolve(
-                nodeModulesRoot,
-                Packager.NODE_MODULES_FODLER_NAME,
-                OPN_PACKAGE_NAME,
-            );
-            this.logger.info(
-                localize(
-                    "VerifyOpenModuleMainFileAndEntry",
-                    "Need to check main file and entry point of open module, will setup and write new content if they're not existing. Path: {0}",
-                    openModulePath,
-                ),
-            );
-
             const flatDependencyPackagePath = path.resolve(
                 nodeModulesRoot,
                 Packager.NODE_MODULES_FODLER_NAME,
@@ -548,11 +535,28 @@ export class Packager {
                 Packager.OPN_PACKAGE_MAIN_FILENAME,
             );
 
+            const parentDependencyPackagePath = path.resolve(
+                nodeModulesRoot,
+                "..",
+                Packager.NODE_MODULES_FODLER_NAME,
+                OPN_PACKAGE_NAME,
+                Packager.OPN_PACKAGE_MAIN_FILENAME,
+            );
+
+            this.logger.info("Looking for 'opn' package...");
+            this.logger.info("Possible paths:");
+            this.logger.info(flatDependencyPackagePath);
+            this.logger.info(nestedDependencyPackagePath);
+            this.logger.info(parentDependencyPackagePath);
+
             const fsHelper = new FileSystem();
 
-            // Attempt to find the 'opn' package directly under the project's node_modules folder (node4 +)
-            // Else, attempt to find the package within the dependent node_modules of react-native package
-            const possiblePaths = [flatDependencyPackagePath, nestedDependencyPackagePath];
+            const possiblePaths = [
+                flatDependencyPackagePath,
+                nestedDependencyPackagePath,
+                parentDependencyPackagePath,
+            ];
+
             const paths = await Promise.all(
                 possiblePaths.map(async fsPath => ((await fsHelper.exists(fsPath)) ? fsPath : "")),
             );
