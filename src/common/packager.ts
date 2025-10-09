@@ -561,9 +561,32 @@ export class Packager {
 
                 const fsHelper = new FileSystem();
 
-                // Attempt to find the 'opn' package directly under the project's node_modules folder (node4 +)
+                // Attempt to find the 'opn'/'open' package directly under the project's node_modules folder
                 // Else, attempt to find the package within the dependent node_modules of react-native package
-                const possiblePaths = [flatDependencyPackagePath, nestedDependencyPackagePath];
+                // Additionally, check the parent directory's node_modules to support monorepo hoisting (e.g. Yarn workspaces)
+                const parentNodeModulesPath = path.resolve(
+                    nodeModulesRoot,
+                    "..",
+                    Packager.NODE_MODULES_FODLER_NAME,
+                );
+                const parentFlatDependencyPackagePath = path.resolve(
+                    parentNodeModulesPath,
+                    OPN_PACKAGE_NAME,
+                    Packager.OPN_PACKAGE_MAIN_FILENAME,
+                );
+                const parentNestedDependencyPackagePath = path.resolve(
+                    parentNodeModulesPath,
+                    Packager.REACT_NATIVE_PACKAGE_NAME,
+                    Packager.NODE_MODULES_FODLER_NAME,
+                    OPN_PACKAGE_NAME,
+                    Packager.OPN_PACKAGE_MAIN_FILENAME,
+                );
+                const possiblePaths = [
+                    flatDependencyPackagePath,
+                    nestedDependencyPackagePath,
+                    parentFlatDependencyPackagePath,
+                    parentNestedDependencyPackagePath,
+                ];
                 const paths = await Promise.all(
                     possiblePaths.map(async fsPath =>
                         (await fsHelper.exists(fsPath)) ? fsPath : "",

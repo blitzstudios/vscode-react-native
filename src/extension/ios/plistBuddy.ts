@@ -262,36 +262,47 @@ export class PlistBuddy {
                 ? iOSCliPlatform
                 : "cli";
 
-        let findXcodeBase = "node_modules/@react-native-community";
-
-        const pnpmProjectPath = path.resolve(nodeModulesRoot, "node_modules", ".pnpm");
-
-        const isPnpmProject =
-            fs.existsSync(pnpmProjectPath) && SettingsHelper.getPackageManager() === "pnpm";
-        if (isPnpmProject) {
-            const modules = fs.readdirSync(pnpmProjectPath);
-            const regex = new RegExp(`\@react-native-community\\+${iOSCliFolderName}@`);
-            const communityModule = modules.find(module => regex.test(module));
-            if (communityModule) {
-                findXcodeBase = path.join(
-                    "node_modules",
-                    ".pnpm",
-                    communityModule,
-                    "node_modules",
-                    "@react-native-community",
-                );
+        const computeFindXcodeBase = (root: string): string => {
+            let base = "node_modules/@react-native-community";
+            const pnpmPath = path.resolve(root, "node_modules", ".pnpm");
+            const isPnpm = fs.existsSync(pnpmPath) && SettingsHelper.getPackageManager() === "pnpm";
+            if (isPnpm) {
+                const modules = fs.readdirSync(pnpmPath);
+                const regex = new RegExp(`\\@react-native-community\\+${iOSCliFolderName}@`);
+                const communityModule = modules.find(module => regex.test(module));
+                if (communityModule) {
+                    base = path.join(
+                        "node_modules",
+                        ".pnpm",
+                        communityModule,
+                        "node_modules",
+                        "@react-native-community",
+                    );
+                }
             }
+            return base;
+        };
+
+        const buildFindXcodeLocation = (base: string): string =>
+            `${base}/${iOSCliFolderName}/build/${
+                semver.gte(rnVersion, PlistBuddy.RN69_FUND_XCODE_PROJECT_LOCATION_VERSION)
+                    ? "config/findXcodeProject"
+                    : "commands/runIOS/findXcodeProject"
+            }`;
+
+        const primaryBase = computeFindXcodeBase(nodeModulesRoot);
+        const primaryLocation = buildFindXcodeLocation(primaryBase);
+
+        let findXcodeProject: (files: string[]) => { name: string } | null;
+        try {
+            findXcodeProject = customRequire(path.join(nodeModulesRoot, primaryLocation)).default;
+        } catch {
+            // Fallback to parent directory's node_modules to support hoisted monorepos
+            const parentRoot = path.resolve(nodeModulesRoot, "..");
+            const parentBase = computeFindXcodeBase(parentRoot);
+            const parentLocation = buildFindXcodeLocation(parentBase);
+            findXcodeProject = customRequire(path.join(parentRoot, parentLocation)).default;
         }
-
-        const findXcodeProjectLocation = `${findXcodeBase}/${iOSCliFolderName}/build/${
-            semver.gte(rnVersion, PlistBuddy.RN69_FUND_XCODE_PROJECT_LOCATION_VERSION)
-                ? "config/findXcodeProject"
-                : "commands/runIOS/findXcodeProject"
-        }`;
-
-        const findXcodeProject = customRequire(
-            path.join(nodeModulesRoot, findXcodeProjectLocation),
-        ).default;
         const xcodeProject = findXcodeProject(fs.readdirSync(platformProjectRoot));
         if (!xcodeProject) {
             throw new Error(

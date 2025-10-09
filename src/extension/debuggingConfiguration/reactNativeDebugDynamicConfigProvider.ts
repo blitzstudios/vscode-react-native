@@ -113,6 +113,14 @@ export class ReactNativeDebugDynamicConfigProvider implements vscode.DebugConfig
             }
         }
 
+        // Merge workspace-level sourceMapPathOverrides with launch configuration
+        if (folder && !config.sourceMapPathOverrides) {
+            const workspaceOverrides = SettingsHelper.getSourceMapPathOverrides(folder.uri);
+            if (workspaceOverrides) {
+                config.sourceMapPathOverrides = workspaceOverrides;
+            }
+        }
+
         return config;
     }
 

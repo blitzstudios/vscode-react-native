@@ -16,6 +16,7 @@ import {
     DebugConfigurationState,
 } from "./debugConfigTypesAndConstants";
 import { DebugScenarioNameGenerator } from "./debugScenarioNameGenerator";
+import { SettingsHelper } from "../settingsHelper";
 
 import { MultiStepInput, IMultiStepInput, InputStep, IQuickPickParameters } from "./multiStepInput";
 import { ConfigProviderFactory } from "./configurationProviders/configProviderFactory";
@@ -197,6 +198,22 @@ export class ReactNativeDebugConfigProvider implements vscode.DebugConfiguration
 
             configPicker.show();
         });
+    }
+
+    public async resolveDebugConfiguration(
+        folder: vscode.WorkspaceFolder | undefined,
+        config: vscode.DebugConfiguration,
+        token?: vscode.CancellationToken, // eslint-disable-line @typescript-eslint/no-unused-vars
+    ): Promise<vscode.ProviderResult<vscode.DebugConfiguration>> {
+        // Merge workspace-level sourceMapPathOverrides with launch configuration
+        if (folder && !config.sourceMapPathOverrides) {
+            const workspaceOverrides = SettingsHelper.getSourceMapPathOverrides(folder.uri);
+            if (workspaceOverrides) {
+                config.sourceMapPathOverrides = workspaceOverrides;
+            }
+        }
+
+        return config;
     }
 
     public async provideDebugConfigurationSequentially(

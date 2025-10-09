@@ -65,10 +65,15 @@ export class AppLauncher {
         new vscode.EventEmitter();
 
     public static getAppLauncherByProjectRootPath(projectRootPath: string): AppLauncher {
-        const appLauncher = ProjectsStorage.projectsCache[projectRootPath.toLowerCase()];
+        let appLauncher = ProjectsStorage.projectsCache[projectRootPath.toLowerCase()];
+        if (!appLauncher) {
+            // Fallback: resolve configured project root (e.g., monorepo subfolder)
+            const resolvedRoot = SettingsHelper.getReactNativeProjectRoot(projectRootPath);
+            appLauncher = ProjectsStorage.projectsCache[resolvedRoot.toLowerCase()];
+        }
         if (!appLauncher) {
             throw new Error(
-                `Could not find AppLauncher by the project root path ${projectRootPath}`,
+                `Could not find AppLauncher(2) by the project root path ${projectRootPath}`,
             );
         }
 
@@ -83,12 +88,14 @@ export class AppLauncher {
             const appLauncherFolder = createAdditionalWorkspaceFolder(projectRootPath);
             if (appLauncherFolder) {
                 await onFolderAdded(appLauncherFolder);
-                appLauncher =
-                    ProjectsStorage.projectsCache[appLauncherFolder.uri.fsPath.toLocaleLowerCase()];
+                const resolvedKey = SettingsHelper.getReactNativeProjectRoot(
+                    appLauncherFolder.uri.fsPath,
+                ).toLocaleLowerCase();
+                appLauncher = ProjectsStorage.projectsCache[resolvedKey];
             }
             if (!appLauncher) {
                 throw new Error(
-                    `Could not find AppLauncher by the project root path ${projectRootPath}`,
+                    `Could not find AppLauncher(1) by the project root path ${projectRootPath}`,
                 );
             }
         }

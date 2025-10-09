@@ -1,11 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for details.
-import * as semver from "semver";
-import { ProjectVersionHelper } from "../common/projectVersionHelper";
+import * as path from "path";
+import { SettingsHelper } from "../extension/settingsHelper";
 import { IAttachRequestArgs } from "./debugSessionBase";
 
 export class JsDebugConfigAdapter {
-    private static RNVersion_Direct_Debug = "0.76.0";
     public static createDebuggingConfigForPureRN(
         attachArgs: IAttachRequestArgs,
         cdpProxyPort: number,
@@ -30,21 +29,21 @@ export class JsDebugConfigAdapter {
         attachArgs: IAttachRequestArgs,
         cdpProxyPort: number,
         sessionId: string,
-    ) {
+    ): Promise<any> {
         const extraArgs: any = {};
-        const versions = await ProjectVersionHelper.getReactNativeVersions(attachArgs.cwd);
-        // Handle project file path from 0.76
-        if (semver.gte(versions.reactNativeVersion, JsDebugConfigAdapter.RNVersion_Direct_Debug)) {
-            extraArgs.sourceMapPathOverrides = {
-                "/[metro-project]/*": `${attachArgs.cwd}/*`,
-            };
-        }
 
-        // Combine source map path between extra arguments and attach arguments
+        // Use user-provided sourceMapPathOverrides if available, otherwise use defaults
         if (attachArgs.sourceMapPathOverrides) {
+            extraArgs.sourceMapPathOverrides = attachArgs.sourceMapPathOverrides;
+        } else {
+            // Default source map path overrides for Metro placeholders
+            const resolvedProjectRoot = SettingsHelper.getReactNativeProjectRoot(attachArgs.cwd);
+            const parentRoot = path.dirname(resolvedProjectRoot);
             extraArgs.sourceMapPathOverrides = {
-                ...extraArgs.sourceMapPathOverrides,
-                ...attachArgs.sourceMapPathOverrides,
+                "[projectRoot]/*": `${resolvedProjectRoot}/*`,
+                "./[projectRoot]/*": `${resolvedProjectRoot}/*`,
+                "[projectRoot^1]/*": `${parentRoot}/*`,
+                "./[projectRoot^1]/*": `${parentRoot}/*`,
             };
         }
 

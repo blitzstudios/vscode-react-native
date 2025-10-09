@@ -829,6 +829,16 @@
                 "default": "log",
                 "description": "%reactNative.launch.trace.description%"
               },
+              "address": {
+                "type": "string",
+                "description": "%reactNative.attach.address.description%",
+                "default": "localhost"
+              },
+              "port": {
+                "type": "number",
+                "description": "%reactNative.attach.port.description%",
+                "default": 8081
+              },
               "debuggerWorkerUrlPath": {
                 "type": "string",
                 "description": "%reactNative.launch.debuggerWorkerUrlPath.description%",
@@ -1035,6 +1045,11 @@
                 "type": "string",
                 "description": "%reactNative.launch.cwd.description%",
                 "default": "${workspaceFolder}"
+              },
+              "address": {
+                "type": "string",
+                "description": "%reactNative.attach.address.description%",
+                "default": "localhost"
               },
               "port": {
                 "type": "number",
@@ -1353,6 +1368,15 @@
           ],
           "scope": "resource",
           "default": "npm"
+        },
+        "react-native-tools.sourceMapPathOverrides": {
+          "description": "A set of mappings for rewriting the locations of source files from what the sourcemap says, to their locations on disk. See 'Launch.json support for sourceMapPathOverrides' for details.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "scope": "resource",
+          "default": {}
         }
       }
     }

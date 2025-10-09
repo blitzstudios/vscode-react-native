@@ -151,6 +151,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
             EXTENSION_CONTEXT.subscriptions.push(
                 vscode.debug.registerDebugConfigurationProvider(
+                    DEBUG_TYPES.REACT_NATIVE_DIRECT,
+                    configProvider,
+                ),
+            );
+
+            EXTENSION_CONTEXT.subscriptions.push(
+                vscode.debug.registerDebugConfigurationProvider(
                     DEBUG_TYPES.REACT_NATIVE,
                     dymConfigProvider,
                     vscode.DebugConfigurationProviderTriggerKind.Dynamic,

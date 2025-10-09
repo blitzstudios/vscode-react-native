@@ -277,4 +277,17 @@ export class SettingsHelper {
         }
         return "";
     }
+
+    /**
+     * Get source map path overrides from workspace settings
+     */
+    public static getSourceMapPathOverrides(uri: vscode.Uri): any {
+        const workspaceConfiguration = vscode.workspace.getConfiguration("react-native-tools", uri);
+        if (workspaceConfiguration.has("sourceMapPathOverrides")) {
+            return ConfigurationReader.readObject(
+                workspaceConfiguration.get("sourceMapPathOverrides"),
+            );
+        }
+        return undefined;
+    }
 }
