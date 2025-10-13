@@ -34,6 +34,7 @@ export class ReactNativeCDPProxy {
     private debuggerEndpointHelper: DebuggerEndpointHelper;
     private CDPMessageHandler: BaseCDPMessageHandler;
     private applicationTargetPort: number;
+    private applicationTargetAddress: string | undefined;
     private browserInspectUri: string;
     private cancellationToken: CancellationToken | undefined;
     private applicationTargetEventEmitter: EventEmitter<unknown> = new EventEmitter();
@@ -92,6 +93,10 @@ export class ReactNativeCDPProxy {
         this.applicationTargetPort = applicationTargetPort;
     }
 
+    public setApplicationTargetAddress(applicationTargetAddress: string | undefined): void {
+        this.applicationTargetAddress = applicationTargetAddress;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private async onConnectionHandler([debuggerTarget, request]: [
         Connection,
@@ -102,15 +107,16 @@ export class ReactNativeCDPProxy {
         this.debuggerTarget.pause(); // don't listen for events until the target is ready
 
         if (!this.browserInspectUri) {
+            const targetAddress = this.applicationTargetAddress || "localhost";
             if (this.cancellationToken) {
                 this.browserInspectUri = await this.debuggerEndpointHelper.retryGetWSEndpoint(
-                    `http://localhost:${this.applicationTargetPort}`,
+                    `http://${targetAddress}:${this.applicationTargetPort}`,
                     90,
                     this.cancellationToken,
                 );
             } else {
                 this.browserInspectUri = await this.debuggerEndpointHelper.getWSEndpoint(
-                    `http://localhost:${this.applicationTargetPort}`,
+                    `http://${targetAddress}:${this.applicationTargetPort}`,
                 );
             }
         }

@@ -250,8 +250,9 @@ export class DirectDebugSession extends DebugSessionBase {
                     });
 
                 const settingsPorts = SettingsHelper.getPackagerPort(attachArgs.cwd);
+                const debugAddress = attachArgs.address || "localhost";
                 const browserInspectUri = await this.debuggerEndpointHelper.retryGetWSEndpoint(
-                    `http://localhost:${attachArgs.port}`,
+                    `http://${debugAddress}:${attachArgs.port}`,
                     90,
                     this.cancellationTokenSource.token,
                     attachArgs.useHermesEngine,
@@ -260,7 +261,7 @@ export class DirectDebugSession extends DebugSessionBase {
 
                 // Make sure expo app is using correct ws endpoint url
                 const debuggerType = await this.debuggerEndpointHelper.getDebuggerTpye(
-                    `http://localhost:${attachArgs.port}`,
+                    `http://${debugAddress}:${attachArgs.port}`,
                 );
                 if (debuggerType == "expo") {
                     const expoBrowserInspectUri = `${browserInspectUri.split("&")[0]}&page=2`;

@@ -47,6 +47,7 @@ export class GeneralPlatform {
                 this.projectPath,
                 SettingsHelper.getPackagerPort(this.runOptions.workspaceRoot),
                 new PackagerStatusIndicator(this.projectPath),
+                this.runOptions.address,
             );
         this.projectObserver = platformDeps.projectObserver;
         this.packager.setRunOptions(runOptions);

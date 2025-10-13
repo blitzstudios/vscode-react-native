@@ -83,6 +83,7 @@ export class Packager {
         private projectPath: string,
         private packagerPort?: number,
         packagerStatusIndicator?: PackagerStatusIndicator,
+        private packagerAddress?: string,
     ) {
         this.packagerStatus = PackagerStatus.PACKAGER_STOPPED;
         this.packagerStatusIndicator =
@@ -118,6 +119,7 @@ export class Packager {
 
     public setRunOptions(runOptions: IRunOptions): void {
         this.runOptions = runOptions;
+        this.packagerAddress = runOptions.address;
     }
 
     public static getHostForPort(port: number): string {
@@ -129,7 +131,8 @@ export class Packager {
     }
 
     public getHost(): string {
-        return Packager.getHostForPort(this.getPort());
+        const address = this.packagerAddress || "localhost";
+        return `${address}:${this.getPort()}`;
     }
 
     public getPackagerStatus(): PackagerStatus {
@@ -175,6 +178,10 @@ export class Packager {
         resetCache: boolean = false,
     ): Promise<string[]> {
         let args: string[] = ["--port", this.getPort().toString()];
+
+        if (this.packagerAddress) {
+            args = args.concat("--host", this.packagerAddress);
+        }
 
         if (resetCache) {
             args = args.concat("--resetCache");

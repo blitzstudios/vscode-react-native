@@ -102,6 +102,7 @@ export class WebDebugSession extends DebugSessionBase {
 
                     this.cdpProxy = this.appLauncher.getRnCdpProxy();
                     this.cdpProxy.setApplicationTargetPort(attachArgs.port);
+                    this.cdpProxy.setApplicationTargetAddress(attachArgs.address);
                     await this.cdpProxy.initializeServer(
                         new RnCDPMessageHandler(),
                         this.cdpProxyLogLevel,

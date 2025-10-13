@@ -168,6 +168,7 @@ export class RNDebugSession extends DebugSessionBase {
                         );
 
                         cdpProxy.setApplicationTargetPort(port);
+                        cdpProxy.setApplicationTargetAddress(attachArgs.address);
 
                         if (this.debugSessionStatus === DebugSessionStatus.ConnectionPending) {
                             return;
