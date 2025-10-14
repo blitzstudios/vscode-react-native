@@ -10,6 +10,7 @@ import { ReactNativeProjectHelper } from "../../common/reactNativeProjectHelper"
 import { PlatformType } from "../launchArgs";
 import { ILaunchRequestArgs } from "../../debugger/debugSessionBase";
 import { ConfigurationProviderHelper } from "../../common/configurationProviderHelper";
+import { resolveCustomVariables } from "../../common/variableResolver";
 import { MultiStepInput, InputStep } from "./multiStepInput";
 import {
     debugConfigurations,
@@ -121,7 +122,10 @@ export class ReactNativeDebugDynamicConfigProvider implements vscode.DebugConfig
             }
         }
 
-        return config;
+        // Resolve custom variables like ${vscode:local_ip}
+        const resolvedConfig = await resolveCustomVariables(config);
+
+        return resolvedConfig;
     }
 
     private async configureExpoScenario(

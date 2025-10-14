@@ -6,6 +6,7 @@ import * as nls from "vscode-nls";
 import { TelemetryHelper } from "../../common/telemetryHelper";
 import { Telemetry } from "../../common/telemetry";
 import { ILaunchRequestArgs } from "../../debugger/debugSessionBase";
+import { resolveCustomVariables } from "../../common/variableResolver";
 import { PlatformType } from "../launchArgs";
 import {
     debugConfigurations,
@@ -213,7 +214,10 @@ export class ReactNativeDebugConfigProvider implements vscode.DebugConfiguration
             }
         }
 
-        return config;
+        // Resolve custom variables like ${vscode:local_ip}
+        const resolvedConfig = await resolveCustomVariables(config);
+
+        return resolvedConfig;
     }
 
     public async provideDebugConfigurationSequentially(

@@ -30,8 +30,15 @@ export class LaunchScenariosManager {
 
     public readLaunchScenarios(): void {
         if (fs.existsSync(this.pathToLaunchFile)) {
-            const content = fs.readFileSync(this.pathToLaunchFile, "utf8");
-            this.launchScenarios = stripJsonTrailingComma(content);
+            try {
+                const content = fs.readFileSync(this.pathToLaunchFile, "utf8");
+                this.launchScenarios = stripJsonTrailingComma(content);
+            } catch (error) {
+                // If JSON parsing fails, initialize with empty object
+                this.launchScenarios = {};
+            }
+        } else {
+            this.launchScenarios = {};
         }
     }
 
