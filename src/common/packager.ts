@@ -105,6 +105,10 @@ export class Packager {
         return this.expoHelper;
     }
 
+    public getPackagerArguments(): string[] {
+        return SettingsHelper.getPackagerArgs(this.workspacePath);
+    }
+
     public getPort(): number {
         return this.packagerPort || SettingsHelper.getPackagerPort(this.workspacePath);
     }
@@ -185,6 +189,11 @@ export class Packager {
 
         if (resetCache) {
             args = args.concat("--resetCache");
+        }
+
+        const additionalArgs = this.getPackagerArguments();
+        if (additionalArgs) {
+            args = args.concat(additionalArgs);
         }
 
         const isExpo = await this.getExponentHelper().isExpoManagedApp(false);
