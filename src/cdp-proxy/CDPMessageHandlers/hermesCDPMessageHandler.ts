@@ -38,6 +38,8 @@ export class HermesCDPMessageHandler extends BaseCDPMessageHandler {
         const sendBack = false;
         if (event.method === CDP_API_NAMES.DEBUGGER_PAUSED) {
             event = this.handlePausedEvent(event);
+        } else if (event.method === CDP_API_NAMES.DEBUGGER_SCRIPT_PARSED) {
+            event = this.handleScriptParsedEvent(event);
         } else if (event.result && event.result.result) {
             event = this.handleFunctionTypeResult(event);
         }
@@ -97,6 +99,22 @@ export class HermesCDPMessageHandler extends BaseCDPMessageHandler {
         );
         event.params.callFrames = callFrames;
 
+        return event;
+    }
+
+    /**
+     * Strip the sourcePaths query param from sourceMapURL so that Metro
+     * serves source maps with absolute file paths instead of
+     * [metro-project] / [metro-watchFolders] placeholders (RN 0.85+).
+     * The script URL is left untouched so setBreakpointByUrl still matches.
+     */
+    private handleScriptParsedEvent(event: any): any {
+        if (event.params?.sourceMapURL) {
+            event.params.sourceMapURL = event.params.sourceMapURL
+                .replace(/([&?])sourcePaths=[^&#]*/g, "$1")
+                .replace(/\?&/, "?")
+                .replace(/\?$/, "");
+        }
         return event;
     }
 

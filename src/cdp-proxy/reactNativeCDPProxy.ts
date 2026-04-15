@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 
 import { IncomingMessage } from "http";
+import * as url from "url";
+import * as WebSocket from "ws";
 import {
     Connection,
     Server,
@@ -122,7 +124,7 @@ export class ReactNativeCDPProxy {
         }
 
         this.applicationTarget = new Connection(
-            await WebSocketTransport.create(this.browserInspectUri),
+            await this.createWebSocketTransport(this.browserInspectUri),
         );
 
         this.applicationTarget.onError(this.onApplicationTargetError.bind(this));
@@ -142,6 +144,27 @@ export class ReactNativeCDPProxy {
 
         // dequeue any messages we got in the meantime
         this.debuggerTarget.unpause();
+    }
+
+    /**
+     * Creates a WebSocketTransport with the Origin header set so that
+     * Metro's inspector endpoint (RN 0.85+) accepts the connection.
+     */
+    private createWebSocketTransport(wsUrl: string): Promise<WebSocketTransport> {
+        let origin: string | undefined;
+        try {
+            const parsed = new url.URL(wsUrl.replace(/^ws(s?):/,  "http$1:"));
+            origin = `http://${parsed.hostname}:${parsed.port}`;
+        } catch {
+            // fall through without origin if URL parsing fails
+        }
+
+        const ws = new WebSocket(wsUrl, { origin });
+
+        return new Promise((resolve, reject) => {
+            ws.addEventListener("open", () => resolve(new WebSocketTransport(ws)));
+            ws.addEventListener("error", () => reject(new Error(`WebSocket connection to ${wsUrl} failed`)));
+        });
     }
 
     private handleDebuggerTargetCommand(event: IProtocolCommand) {
